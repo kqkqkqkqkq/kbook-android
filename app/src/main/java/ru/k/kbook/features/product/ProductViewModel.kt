@@ -23,11 +23,16 @@ class ProductViewModel(
     var searchQuery: String? = null
         private set
 
-    val categories: List<ProductCategory>? = null
-    val cookingRequired: List<CookingRequired>? = null
-    val flags: List<ProductFlag>? = null
-    val sortBy: SortField = SortField.NAME
-    val sortDirection: SortDirection = SortDirection.DESC
+    var categories: List<ProductCategory> = emptyList()
+        private set
+    var cookingRequired: List<CookingRequired> = emptyList()
+        private set
+    var flags: List<ProductFlag> = emptyList()
+        private set
+    var sortBy: SortField = SortField.NAME
+        private set
+    var sortDirection: SortDirection = SortDirection.DESC
+        private set
 
     private val _products = MutableStateFlow(emptyList<Product>())
     val products = _products.asStateFlow()
@@ -39,11 +44,48 @@ class ProductViewModel(
     fun getProducts() {
         viewModelScope.launch {
             try {
-                val req = ListProductsRequestDto(searchQuery, categories, cookingRequired, flags, sortBy, sortDirection);
+                val req = ListProductsRequestDto(
+                    searchQuery,
+                    categories,
+                    cookingRequired,
+                    flags,
+                    sortBy,
+                    sortDirection,
+                )
                 _products.emit(productRepository.listProducts(req).products)
             } catch (e: Exception) {
                 Log.e("ProductViewModel", e.message.toString())
             }
         }
+    }
+
+    fun updateSearch(queryString: String?) {
+        searchQuery = queryString
+        getProducts()
+    }
+
+    fun updateCategories(categories: List<ProductCategory>) {
+        this.categories = categories
+        getProducts()
+    }
+
+    fun updateCookingRequired(cookingRequired: List<CookingRequired>) {
+        this.cookingRequired = cookingRequired
+        getProducts()
+    }
+
+    fun updateFlags(flags: List<ProductFlag>) {
+        this.flags = flags
+        getProducts()
+    }
+
+    fun updateSortBy(sortBy: SortField) {
+        this.sortBy = sortBy
+        getProducts()
+    }
+
+    fun updateSortDirection(sortDirection: SortDirection) {
+        this.sortDirection = sortDirection
+        getProducts()
     }
 }
