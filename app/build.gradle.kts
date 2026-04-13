@@ -6,6 +6,7 @@ plugins {
 //    alias(libs.plugins.protobuf)
     id("com.google.protobuf")
     alias(libs.plugins.kotlin.android)
+    kotlin("plugin.serialization") version "2.0.21"
 }
 
 //kotlin { jvmToolchain(21) }
@@ -99,6 +100,7 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
     // gRPC
     implementation("io.grpc:grpc-protobuf:1.80.0")
@@ -107,7 +109,8 @@ dependencies {
     implementation("io.grpc:grpc-kotlin-stub:1.5.0")
     implementation("com.google.protobuf:protobuf-kotlin:4.31.1")
     implementation("com.google.protobuf:protobuf-java:4.31.1")
-//    implementation("com.google.protobuf:protobuf-java-lite:3.19.2")
-//    implementation("io.grpc:grpc-protobuf-lite:1.80.0")
-//    implementation("io.grpc:grpc-stub:1.80.0")
+
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.9.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 }

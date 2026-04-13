@@ -1,0 +1,151 @@
+syntax = "proto3";
+
+package ru.k.kbook_api.grpc.dish;
+
+option java_multiple_files = true;
+option java_package = "ru.k.kbook_api.grpc.dish";
+option java_outer_classname = "DishProto";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service DishService {
+  rpc CreateDish(CreateDishRequest) returns (Dish);
+  rpc GetDish(GetDishRequest) returns (Dish);
+  rpc UpdateDish(UpdateDishRequest) returns (Dish);
+  rpc DeleteDish(DeleteDishRequest) returns (DeleteDishResponse);
+  // Designed to behave like ProductService.ListProducts:
+  // empty request body = "no filters".
+  rpc ListDishes(ListDishesRequest) returns (DishListResponse);
+  rpc ValidateDish(CreateDishRequest) returns (ValidateDishResponse);
+}
+
+// Wrapper messages to preserve field presence for repeated fields in proto3.
+// This allows UpdateDishRequest to distinguish "not provided" vs "provided empty (clear)".
+message DishImages {
+  repeated DishImage items = 1; // 0-5
+}
+
+message DishComposition {
+  repeated DishProduct items = 1; // min 1 (business rule)
+}
+
+message DishFlags {
+  repeated DishFlag items = 1; // may be empty
+}
+
+// Enums
+enum DishCategory {
+  DESSERT = 0;
+  FIRST = 1;
+  SECOND = 2;
+  DRINK = 3;
+  SALAD = 4;
+  SOUP = 5;
+  SNACK = 6;
+}
+
+enum DishFlag {
+  VEGAN = 0;
+  GLUTEN_FREE = 1;
+  SUGAR_FREE = 2;
+}
+
+// Основная сущность блюда
+message Dish {
+  int64 id = 1;
+  string name = 2;
+  repeated DishImage images = 3;
+  double caloricity = 4;  // ккал/порция (авто + ручная корректировка)
+  double protein = 5;     // г/порция
+  double fat = 6;         // г/порция
+  double carb = 7;        // г/порция
+  repeated DishProduct composition = 8;  // состав: продукт + количество г
+  double portion_size = 9;  // г (>0)
+  DishCategory category = 10;
+  repeated DishFlag flags = 11;  // флаги (по правилам 2.4)
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+}
+
+// Изображение блюда
+message DishImage {
+  int64 id = 1;
+  string url = 2;     // опционально
+  bytes image = 3;    // base64 или bytes
+  string content_type = 4;  // image/jpeg и т.д.
+}
+
+// Элемент состава: продукт + количество
+message DishProduct {
+  int64 product_id = 1;     // ссылка на существующий Product
+  string product_name = 2;  // для UI (денорм)
+  double quantity = 3;      // г в порции (>0)
+}
+
+// Request для создания/редактирования (валидация на клиенте/сервисе)
+message CreateDishRequest {
+  string name = 1;          // может содержать !макросы (2.3)
+  repeated DishImage images = 2;  // 0-5
+  repeated DishProduct composition = 3;  // min 1
+  double portion_size = 4;  // г >0
+  optional DishCategory category = 5; // если задано — приоритет над макросом в названии (2.3)
+  repeated DishFlag flags = 6;  // только доступные по 2.4
+  // КБЖУ: система считает черновик (2.2), но пользователь может скорректировать вручную
+  optional double caloricity = 7;
+  optional double protein = 8;
+  optional double fat = 9;
+  optional double carb = 10;
+}
+
+message UpdateDishRequest {
+  int64 id = 1;
+  optional string name = 2;
+  optional DishImages images = 3;            // presence-aware; empty items clears images
+  optional DishComposition composition = 4;  // presence-aware; empty items invalid (min 1)
+  optional double portion_size = 5;
+  optional DishCategory category = 6;
+  optional DishFlags flags = 7;              // presence-aware; empty items clears flags
+  // КБЖУ: auto или ручная (опционально)
+  optional double caloricity = 8;
+  optional double protein = 9;
+  optional double fat = 10;
+  optional double carb = 11;
+}
+
+message ListDishesRequest {
+  optional string search_query = 1; // по имени (case insensitive)
+  repeated DishCategory categories = 2;
+  repeated DishFlag flags = 3;
+  optional uint32 limit = 4;
+  optional uint32 offset = 5;
+}
+
+message GetDishRequest {
+  int64 id = 1;
+}
+
+message DeleteDishRequest {
+  int64 id = 1;
+}
+
+message DeleteDishResponse {
+  bool success = 1;
+}
+
+message DishListResponse {
+  repeated Dish dishes = 1;
+  int32 total = 2;  // для пагинации
+}
+
+message ValidateDishResponse {
+  bool valid = 1;
+  repeated string errors = 2;  // "flag VEGAN unavailable", "БЖУ >100 на 100г"
+  // calculated КБЖУ
+  double calculated_caloricity = 3;
+  double calculated_protein = 4;
+  double calculated_fat = 5;
+  double calculated_carb = 6;
+  // available flags
+  repeated DishFlag available_flags = 7;
+}
