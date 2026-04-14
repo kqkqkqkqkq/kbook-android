@@ -2,6 +2,7 @@ package ru.k.kbook.data
 
 import ru.k.kbook.api.grpc.ProductApi
 import ru.k.kbook.api.grpc.ProductApiImpl
+import ru.k.kbook.api.grpc.ProductApiMock
 import ru.k.kbook.api.grpc.request.CreateProductRequestDto
 import ru.k.kbook.api.grpc.request.DeleteProductRequestDto
 import ru.k.kbook.api.grpc.request.GetProductRequestDto
@@ -14,7 +15,7 @@ import ru.k.kbook.api.grpc.response.ProductResponseDto
 import ru.k.kbook.domain.product.ProductRepository
 
 class ProductRepositoryImpl(
-    private val productApi: ProductApi = ProductApiImpl()
+    private val productApi: ProductApi = ProductApiMock() // TODO ProductApiImpl()
 ) : ProductRepository {
     override suspend fun createProduct(product: CreateProductRequestDto): ProductResponseDto {
         return productApi.createProduct(product)

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.k.kbook.api.grpc.request.ListProductsRequestDto
 import ru.k.kbook.api.grpc.schema.CookingRequired
@@ -20,72 +21,47 @@ class ProductViewModel(
     private val productRepository: ProductRepository = ProductRepositoryImpl(),
 ) : ViewModel() {
 
-    var searchQuery: String? = null
-        private set
-
-    var categories: List<ProductCategory> = emptyList()
-        private set
-    var cookingRequired: List<CookingRequired> = emptyList()
-        private set
-    var flags: List<ProductFlag> = emptyList()
-        private set
-    var sortBy: SortField = SortField.NAME
-        private set
-    var sortDirection: SortDirection = SortDirection.DESC
-        private set
-
-    private val _products = MutableStateFlow(emptyList<Product>())
-    val products = _products.asStateFlow()
+    private val _state = MutableStateFlow(ProductScreenState())
+    val state = _state.asStateFlow()
 
     init {
         getProducts()
     }
 
-    fun getProducts() {
+    private fun getProducts() {
         viewModelScope.launch {
             try {
                 val req = ListProductsRequestDto(
-                    searchQuery,
-                    categories,
-                    cookingRequired,
-                    flags,
-                    sortBy,
-                    sortDirection,
+                    _state.value.searchQuery,
+                    _state.value.categories,
+                    _state.value.cookingRequired,
+                    _state.value.flags,
+                    _state.value.sortBy,
+                    _state.value.sortDirection,
                 )
-                _products.emit(productRepository.listProducts(req).products)
+                _state.update { it.copy(error = null) }
+                _state.update { it.copy(products = productRepository.listProducts(req).products) }
             } catch (e: Exception) {
-                Log.e("ProductViewModel", e.message.toString())
+                Log.e("ProductViewModel", e.message ?: "Unknown exception")
+                _state.update { it.copy(error = e.localizedMessage) }
             }
         }
     }
 
-    fun updateSearch(queryString: String?) {
-        searchQuery = queryString
-        getProducts()
-    }
-
-    fun updateCategories(categories: List<ProductCategory>) {
-        this.categories = categories
-        getProducts()
-    }
-
-    fun updateCookingRequired(cookingRequired: List<CookingRequired>) {
-        this.cookingRequired = cookingRequired
-        getProducts()
-    }
-
-    fun updateFlags(flags: List<ProductFlag>) {
-        this.flags = flags
-        getProducts()
-    }
-
-    fun updateSortBy(sortBy: SortField) {
-        this.sortBy = sortBy
-        getProducts()
-    }
-
-    fun updateSortDirection(sortDirection: SortDirection) {
-        this.sortDirection = sortDirection
-        getProducts()
+    fun updateState(newState: ProductScreenState) {
+        viewModelScope.launch {
+            _state.emit(newState)
+        }
     }
 }
+
+data class ProductScreenState(
+    val searchQuery: String? = null,
+    val categories: List<ProductCategory> = emptyList(),
+    val cookingRequired: List<CookingRequired> = emptyList(),
+    val flags: List<ProductFlag> = emptyList(),
+    val sortBy: SortField = SortField.NAME,
+    val sortDirection: SortDirection = SortDirection.DESC,
+    val products: List<Product> = emptyList(),
+    val error: String? = null,
+)

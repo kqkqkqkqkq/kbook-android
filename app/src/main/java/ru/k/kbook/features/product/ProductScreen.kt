@@ -1,6 +1,9 @@
 package ru.k.kbook.features.product
 
+import android.util.Log
+import android.util.Log.e
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,17 +18,16 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,48 +44,59 @@ fun ProductScreen(
     onNavigate: (Product) -> Unit,
 ) {
     val viewModel = viewModel<ProductViewModel>()
-    val state = viewModel.products.collectAsStateWithLifecycle()
+    val state = viewModel.state.collectAsStateWithLifecycle()
     when {
-        state.value.isNotEmpty() -> ProductScreenContent(state.value, onNavigate, viewModel)
-        else -> ProductScreenEmpty()
+        state.value.error != null -> ProductScreenError(state.value.error ?: "Unknown error")
+        else -> ProductScreenContent(
+            state.value,
+            onNavigate,
+            viewModel,
+        )
     }
 }
 
 @Composable
-fun ProductScreenEmpty() {
-
+fun ProductScreenError(e: String) {
+    Scaffold(
+        modifier = Modifier
+            .fillMaxWidth(),
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(e, color = Color.Red)
+        }
+    }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductScreenContent(
-    products: List<Product>,
+    state: ProductScreenState,
     onNavigate: (Product) -> Unit,
     viewModel: ProductViewModel,
 ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val searchQuery by remember { mutableStateOf(viewModel.searchQuery) }
 
-    // TODO("update ui and mock data from api")
-    var categories by remember { mutableStateOf(viewModel.categories) }
-    var cookingRequired by remember { mutableStateOf(viewModel.cookingRequired) }
-    var flags by remember { mutableStateOf(viewModel.flags) }
-    var sortBy by remember { mutableStateOf(viewModel.sortBy) }
-    var sortDirection by remember { mutableStateOf(viewModel.sortDirection) }
 
     Scaffold(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxSize(),
         topBar = { TopAppBar(title = { Text("Блюда") }) },
         snackbarHost = { snackbarHostState },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-
+                    // TODO("open detail screen with null data")
                 },
             ) {
-                Icon(Icons.Default.Add, contentDescription = "")
+                Icon(Icons.Default.Add, contentDescription = null)
             }
         },
         floatingActionButtonPosition = FabPosition.End,
@@ -93,10 +106,17 @@ fun ProductScreenContent(
                 .padding(padding)
                 .padding(12.dp)
                 .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {
             item {
-                // TODO("search bar")
+                OutlinedTextField(
+                    value = state.searchQuery.orEmpty(),
+                    onValueChange = {
+                        viewModel.updateState(state.copy(searchQuery = it))
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
             item {
                 Text("Product category", style = MaterialTheme.typography.labelMedium)
@@ -108,12 +128,13 @@ fun ProductScreenContent(
                 ) {
                     items(ProductCategory.entries) { category ->
                         FilterChip(
-                            selected = category in categories,
+                            selected = category in state.categories,
                             onClick = {
-                                if (category in viewModel.categories) {
-                                    viewModel.updateCategories(viewModel.categories - category)
+                                Log.d("UI-PRODUCT", "$category - ${state.categories}")
+                                if (category in state.categories) {
+                                    viewModel.updateState(state.copy(categories = state.categories - category))
                                 } else {
-                                    viewModel.updateCategories(viewModel.categories + category)
+                                    viewModel.updateState(state.copy(categories = state.categories + category))
                                 }
                             },
                             label = { Text(category.name) },
@@ -131,12 +152,12 @@ fun ProductScreenContent(
                 ) {
                     items(CookingRequired.entries) { category ->
                         FilterChip(
-                            selected = category in viewModel.cookingRequired,
+                            selected = category in state.cookingRequired,
                             onClick = {
-                                if (category in viewModel.cookingRequired) {
-                                    viewModel.updateCookingRequired(viewModel.cookingRequired - category)
+                                if (category in state.cookingRequired) {
+                                    viewModel.updateState(state.copy(cookingRequired = state.cookingRequired - category))
                                 } else {
-                                    viewModel.updateCookingRequired(viewModel.cookingRequired + category)
+                                    viewModel.updateState(state.copy(cookingRequired = state.cookingRequired + category))
                                 }
                             },
                             label = { Text(category.name) },
@@ -154,12 +175,12 @@ fun ProductScreenContent(
                 ) {
                     items(ProductFlag.entries) { category ->
                         FilterChip(
-                            selected = category in viewModel.flags,
+                            selected = category in state.flags,
                             onClick = {
-                                if (category in viewModel.flags) {
-                                    viewModel.updateFlags(viewModel.flags - category)
+                                if (category in state.flags) {
+                                    viewModel.updateState(state.copy(flags = state.flags - category))
                                 } else {
-                                    viewModel.updateFlags(viewModel.flags + category)
+                                    viewModel.updateState(state.copy(flags = state.flags + category))
                                 }
                             },
                             label = { Text(category.name) },
@@ -177,9 +198,9 @@ fun ProductScreenContent(
                 ) {
                     items(SortField.entries) { category ->
                         FilterChip(
-                            selected = category == viewModel.sortBy,
+                            selected = category == state.sortBy,
                             onClick = {
-                                viewModel.updateSortBy(category)
+                                viewModel.updateState(state.copy(sortBy = category))
                             },
                             label = { Text(category.name) },
                         )
@@ -196,18 +217,42 @@ fun ProductScreenContent(
                 ) {
                     items(SortDirection.entries) { category ->
                         FilterChip(
-                            selected = category == viewModel.sortDirection,
+                            selected = category == state.sortDirection,
                             onClick = {
-                                viewModel.updateSortDirection(category)
+                                viewModel.updateState(state.copy(sortDirection = category))
                             },
                             label = { Text(category.name) },
                         )
                     }
                 }
             }
-            items(products) { product ->
-                ProductCard(product, onNavigate)
+            if (state.products.isNotEmpty()) {
+                items(state.products) { product ->
+                    ProductCard(product, onNavigate)
+                }
+            } else {
+                item {
+                    ProductScreenEmpty()
+                }
             }
+        }
+    }
+}
+
+@Composable
+fun ProductScreenEmpty() {
+    Scaffold(
+        modifier = Modifier
+            .fillMaxWidth(),
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text("Products is Empty", color = Color.Red)
         }
     }
 }
