@@ -1,8 +1,10 @@
 package ru.k.kbook.features.product
 
-import android.util.Log
-import android.util.Log.e
+import android.annotation.SuppressLint
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
@@ -20,15 +23,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.k.kbook.api.grpc.schema.CookingRequired
@@ -42,59 +47,41 @@ import ru.k.kbook.features.product.components.ProductCard
 @Composable
 fun ProductScreen(
     onNavigate: (Product) -> Unit,
+    onCreate: () -> Unit,
 ) {
     val viewModel = viewModel<ProductViewModel>()
-    val state = viewModel.state.collectAsStateWithLifecycle()
-    when {
-        state.value.error != null -> ProductScreenError(state.value.error ?: "Unknown error")
-        else -> ProductScreenContent(
-            state.value,
-            onNavigate,
-            viewModel,
-        )
-    }
-}
-
-@Composable
-fun ProductScreenError(e: String) {
-    Scaffold(
-        modifier = Modifier
-            .fillMaxWidth(),
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(e, color = Color.Red)
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.events.collect {
+            val text = when (it) {
+                is ProductListEvent.Error -> it.message
+                is ProductListEvent.Info -> it.message
+            }
+            Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         }
     }
+    when (val state = viewModel.uiState.collectAsStateWithLifecycle().value) {
+        ProductListUiState.Loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Loading") }
+        is ProductListUiState.Error -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(state.message) }
+        is ProductListUiState.Data -> ProductScreenContent(state.value, onNavigate, onCreate, viewModel)
+    }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductScreenContent(
-    state: ProductScreenState,
+    state: ProductListState,
     onNavigate: (Product) -> Unit,
+    onCreate: () -> Unit,
     viewModel: ProductViewModel,
 ) {
-
-    val snackbarHostState = remember { SnackbarHostState() }
-
-
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
-        topBar = { TopAppBar(title = { Text("Блюда") }) },
-        snackbarHost = { snackbarHostState },
+        topBar = { TopAppBar(title = { Text("Products") }) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    // TODO("open detail screen with null data")
-                },
+                onClick = onCreate,
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
             }
@@ -103,7 +90,7 @@ fun ProductScreenContent(
     ) { padding ->
         LazyColumn(
             modifier = Modifier
-                .padding(padding)
+                .padding(top = padding.calculateTopPadding())
                 .padding(12.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -111,11 +98,16 @@ fun ProductScreenContent(
         ) {
             item {
                 OutlinedTextField(
-                    value = state.searchQuery.orEmpty(),
+                    value = state.searchQuery,
                     onValueChange = {
-                        viewModel.updateState(state.copy(searchQuery = it))
+                        viewModel.onSearchChange(it)
                     },
                     modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Search product") },
+                    singleLine = true,
+                    leadingIcon = {
+                        Icon(Icons.Default.Search, contentDescription = null)
+                    },
                 )
             }
             item {
@@ -130,12 +122,7 @@ fun ProductScreenContent(
                         FilterChip(
                             selected = category in state.categories,
                             onClick = {
-                                Log.d("UI-PRODUCT", "$category - ${state.categories}")
-                                if (category in state.categories) {
-                                    viewModel.updateState(state.copy(categories = state.categories - category))
-                                } else {
-                                    viewModel.updateState(state.copy(categories = state.categories + category))
-                                }
+                                viewModel.onCategoryToggle(category)
                             },
                             label = { Text(category.name) },
                         )
@@ -154,11 +141,7 @@ fun ProductScreenContent(
                         FilterChip(
                             selected = category in state.cookingRequired,
                             onClick = {
-                                if (category in state.cookingRequired) {
-                                    viewModel.updateState(state.copy(cookingRequired = state.cookingRequired - category))
-                                } else {
-                                    viewModel.updateState(state.copy(cookingRequired = state.cookingRequired + category))
-                                }
+                                viewModel.onCookingToggle(category)
                             },
                             label = { Text(category.name) },
                         )
@@ -177,11 +160,7 @@ fun ProductScreenContent(
                         FilterChip(
                             selected = category in state.flags,
                             onClick = {
-                                if (category in state.flags) {
-                                    viewModel.updateState(state.copy(flags = state.flags - category))
-                                } else {
-                                    viewModel.updateState(state.copy(flags = state.flags + category))
-                                }
+                                viewModel.onFlagToggle(category)
                             },
                             label = { Text(category.name) },
                         )
@@ -196,13 +175,11 @@ fun ProductScreenContent(
                         .padding(top = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    items(SortField.entries) { category ->
+                    items(SortField.entries) { field ->
                         FilterChip(
-                            selected = category == state.sortBy,
-                            onClick = {
-                                viewModel.updateState(state.copy(sortBy = category))
-                            },
-                            label = { Text(category.name) },
+                            selected = field == state.sortBy,
+                            onClick = { viewModel.onSort(field, state.sortDirection) },
+                            label = { Text(field.name) },
                         )
                     }
                 }
@@ -215,20 +192,22 @@ fun ProductScreenContent(
                         .padding(top = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    items(SortDirection.entries) { category ->
+                    items(SortDirection.entries) { direction ->
                         FilterChip(
-                            selected = category == state.sortDirection,
-                            onClick = {
-                                viewModel.updateState(state.copy(sortDirection = category))
-                            },
-                            label = { Text(category.name) },
+                            selected = direction == state.sortDirection,
+                            onClick = { viewModel.onSort(state.sortBy, direction) },
+                            label = { Text(direction.name) },
                         )
                     }
                 }
             }
-            if (state.products.isNotEmpty()) {
+                if (state.products.isNotEmpty()) {
                 items(state.products) { product ->
-                    ProductCard(product, onNavigate)
+                    ProductCard(
+                        product = product,
+                        onNavigate = onNavigate,
+                        onDelete = { viewModel.deleteProduct(product.id) },
+                    )
                 }
             } else {
                 item {
@@ -241,18 +220,16 @@ fun ProductScreenContent(
 
 @Composable
 fun ProductScreenEmpty() {
-    Scaffold(
-        modifier = Modifier
-            .fillMaxWidth(),
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text("Products is Empty", color = Color.Red)
-        }
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("Products are empty")
     }
+}
+
+@SuppressLint("ViewModelConstructorInComposable")
+@Preview(showBackground = true)
+@Composable
+fun ProductScreenContentPreview(modifier: Modifier = Modifier) {
+    ProductScreenContent(state = ProductListState(), {}, {}, ProductViewModel())
 }
