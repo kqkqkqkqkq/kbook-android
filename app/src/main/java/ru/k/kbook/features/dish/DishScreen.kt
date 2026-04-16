@@ -10,9 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -58,10 +63,32 @@ private fun DishListContent(
     onDetail: (Dish) -> Unit,
     vm: DishViewModel,
 ) {
-    Scaffold(topBar = { TopAppBar(title = { Text("Dishes") }) }) { padding ->
+    Scaffold(
+        modifier = Modifier
+            .padding(bottom = 80.dp)
+            .fillMaxSize(),
+        topBar = { TopAppBar(title = { Text("Dishes") }) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    // TODO("on create dish")
+                },
+            ) {
+                Icon(Icons.Default.Add, contentDescription = null)
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End,
+    ) { padding ->
         LazyColumn(
-            modifier = Modifier.padding(padding).padding(16.dp).fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    top = padding.calculateTopPadding(),
+                    bottom = padding.calculateBottomPadding()
+                )
+                .padding(horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.Start,
         ) {
                 item {
                     OutlinedTextField(value = state.search, onValueChange = vm::onSearch, modifier = Modifier.fillMaxWidth(), label = { Text("Search") })

@@ -1,13 +1,14 @@
-package ru.k.kbook.features.product
+package ru.k.kbook.features.product.list
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
@@ -29,11 +31,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.k.kbook.api.grpc.schema.CookingRequired
@@ -61,9 +61,27 @@ fun ProductScreen(
         }
     }
     when (val state = viewModel.uiState.collectAsStateWithLifecycle().value) {
-        ProductListUiState.Loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Loading") }
-        is ProductListUiState.Error -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(state.message) }
-        is ProductListUiState.Data -> ProductScreenContent(state.value, onNavigate, onCreate, viewModel)
+        ProductListUiState.Loading -> Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text("Loading...")
+            Spacer(modifier = Modifier.height(8.dp))
+            CircularProgressIndicator()
+        }
+
+        is ProductListUiState.Error -> Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) { Text(state.message) }
+
+        is ProductListUiState.Data -> ProductScreenContent(
+            state.value,
+            onNavigate,
+            onCreate,
+            viewModel,
+        )
     }
 }
 
@@ -77,6 +95,7 @@ fun ProductScreenContent(
 ) {
     Scaffold(
         modifier = Modifier
+            .padding(bottom = 80.dp)
             .fillMaxSize(),
         topBar = { TopAppBar(title = { Text("Products") }) },
         floatingActionButton = {
@@ -90,9 +109,12 @@ fun ProductScreenContent(
     ) { padding ->
         LazyColumn(
             modifier = Modifier
-                .padding(top = padding.calculateTopPadding())
-                .padding(12.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(
+                    top = padding.calculateTopPadding(),
+                    bottom = padding.calculateBottomPadding()
+                )
+                .padding(horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {
@@ -111,11 +133,9 @@ fun ProductScreenContent(
                 )
             }
             item {
-                Text("Product category", style = MaterialTheme.typography.labelMedium)
+//                Text("Product category", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 6.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(ProductCategory.entries) { category ->
@@ -130,11 +150,9 @@ fun ProductScreenContent(
                 }
             }
             item {
-                Text("Cooking Require", style = MaterialTheme.typography.labelMedium)
+//                Text("Cooking Require", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 6.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(CookingRequired.entries) { category ->
@@ -149,7 +167,7 @@ fun ProductScreenContent(
                 }
             }
             item {
-                Text("Flags", style = MaterialTheme.typography.labelMedium)
+//                Text("Flags", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -168,7 +186,7 @@ fun ProductScreenContent(
                 }
             }
             item {
-                Text("Sort by", style = MaterialTheme.typography.labelMedium)
+//                Text("Sort by", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -185,7 +203,7 @@ fun ProductScreenContent(
                 }
             }
             item {
-                Text("Sort direction", style = MaterialTheme.typography.labelMedium)
+//                Text("Sort direction", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -201,7 +219,10 @@ fun ProductScreenContent(
                     }
                 }
             }
-                if (state.products.isNotEmpty()) {
+            if (state.products.isNotEmpty()) {
+                item {
+                    Text(text = "${state.products.size} products found.", style = MaterialTheme.typography.labelMedium)
+                }
                 items(state.products) { product ->
                     ProductCard(
                         product = product,
@@ -220,9 +241,12 @@ fun ProductScreenContent(
 
 @Composable
 fun ProductScreenEmpty() {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Text("Products are empty")
     }
 }
@@ -230,6 +254,6 @@ fun ProductScreenEmpty() {
 @SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
-fun ProductScreenContentPreview(modifier: Modifier = Modifier) {
+fun ProductScreenContentPreview() {
     ProductScreenContent(state = ProductListState(), {}, {}, ProductViewModel())
 }

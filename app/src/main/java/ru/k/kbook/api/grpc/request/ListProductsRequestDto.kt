@@ -7,12 +7,12 @@ import ru.k.kbook.api.grpc.schema.SortDirection
 import ru.k.kbook.api.grpc.schema.SortField
 
 data class ListProductsRequestDto(
-    val searchQuery: String?,
-    val categories: List<ProductCategory>?,
-    val cookingRequired: List<CookingRequired>?,
-    val flags: List<ProductFlag>?,
-    val sortBy: SortField?,
-    val sortDirection: SortDirection?,
+    val searchQuery: String? = null,
+    val categories: List<ProductCategory>? = null,
+    val cookingRequired: List<CookingRequired>? = null,
+    val flags: List<ProductFlag>? = null,
+    val sortBy: SortField? = null,
+    val sortDirection: SortDirection? = null,
     val limit: Int? = null,
     val offset: Int? = null,
 )

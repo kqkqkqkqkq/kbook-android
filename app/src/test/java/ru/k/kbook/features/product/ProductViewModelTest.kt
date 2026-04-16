@@ -20,6 +20,8 @@ import ru.k.kbook.api.grpc.response.DeleteProductResponseDto
 import ru.k.kbook.api.grpc.response.ListProductsResponseDto
 import ru.k.kbook.api.grpc.response.ProductResponseDto
 import ru.k.kbook.domain.product.ProductRepository
+import ru.k.kbook.features.product.list.ProductListUiState
+import ru.k.kbook.features.product.list.ProductViewModel
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProductViewModelTest {
