@@ -2,6 +2,7 @@ package ru.k.kbook.features.product.create
 
 import ru.k.kbook.api.grpc.schema.CookingRequired
 import ru.k.kbook.api.grpc.schema.ProductCategory
+import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
 
 data class ProductCreateUiState(
@@ -14,6 +15,7 @@ data class ProductCreateUiState(
     val description: String = "",
     val category: ProductCategory = ProductCategory.MEAT,
     val cookingRequired: CookingRequired = CookingRequired.REQUIRES_COOKING,
+    val flags: List<ProductFlag> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
 )

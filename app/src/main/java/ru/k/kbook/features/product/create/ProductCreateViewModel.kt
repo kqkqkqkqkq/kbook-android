@@ -12,6 +12,7 @@ import ru.k.kbook.api.grpc.schema.CookingRequired
 import ru.k.kbook.api.grpc.schema.ImageInput
 import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.api.grpc.schema.ProductCategory
+import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
 import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.product.ProductRepository
@@ -70,6 +71,15 @@ class ProductCreateViewModel(
         _uiState.value = _uiState.value.copy(cookingRequired = cooking)
     }
 
+    fun updateFlags(flag: ProductFlag) {
+        val flags = _uiState.value.flags
+        if (flag in flags) {
+            _uiState.value = _uiState.value.copy(flags = flags - flag)
+        } else {
+            _uiState.value = _uiState.value.copy(flags = flags + flag)
+        }
+    }
+
     fun createProduct(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
@@ -81,6 +91,7 @@ class ProductCreateViewModel(
             }
 
             try {
+                // TODO()
                 val product = CreateProductRequestDto(
                     name = _uiState.value.name,
                     images = _uiState.value.images.map {
@@ -97,8 +108,9 @@ class ProductCreateViewModel(
                     description = _uiState.value.description.ifBlank { null },
                     category = _uiState.value.category,
                     cookingRequired = _uiState.value.cookingRequired,
-                    flags = emptyList(),
+                    flags = _uiState.value.flags,
                 )
+                println(product)
                 val response = repository.createProduct(product)
                 if (response.success) {
                     onSuccess()

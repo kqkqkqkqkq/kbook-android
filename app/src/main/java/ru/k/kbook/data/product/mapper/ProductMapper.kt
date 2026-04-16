@@ -9,6 +9,7 @@ import ru.k.kbook_api.grpc.product.ProductDto
 import java.time.Instant
 
 fun CreateProductRequestDto.toGrpc(): CreateProductRequest {
+    println("create request: $this")
     return CreateProductRequest.newBuilder()
         .setName(name)
         .addAllImages(images.map { img ->
@@ -22,7 +23,7 @@ fun CreateProductRequestDto.toGrpc(): CreateProductRequest {
         .setProtein(protein)
         .setFat(fat)
         .setCarb(carb)
-        .setDescription(description ?: "")
+        .setDescription(description)
         .setCategory(category.toGrpc())
         .setCookingRequired(cookingRequired.toGrpc())
         .addAllFlags(flags.map { it.toGrpc() })
@@ -93,7 +94,7 @@ fun ProductDto.toKotlin(): Product {
         images = imagesList.map { img ->
             ProductImage(
                 id = img.id,
-                url = img.url.takeIf { it.isNotEmpty() },
+                url = img.url,
                 image = if (img.image.isEmpty) null else img.image.toByteArray(),
                 contentType = ContentType.valueOf(img.contentType.name)
             )
@@ -102,7 +103,7 @@ fun ProductDto.toKotlin(): Product {
         protein = protein,
         fat = fat,
         carb = carb,
-        description = description.takeIf { it.isNotEmpty() },
+        description = description,
         category = ProductCategory.valueOf(category.name),
         cookingRequired = CookingRequired.valueOf(cookingRequired.name),
         flags = flagsList.map { ProductFlag.valueOf(it.name) },

@@ -3,6 +3,7 @@ package ru.k.kbook.features.product.create
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -47,11 +49,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
 import ru.k.kbook.api.grpc.schema.ContentType
 import ru.k.kbook.api.grpc.schema.CookingRequired
 import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.api.grpc.schema.ProductCategory
+import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -191,6 +195,21 @@ fun ProductCreateScreen(
                     }
                 }
             }
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                ProductFlag.entries.forEach { category ->
+                    FilterChip(
+                        selected = category in state.flags,
+                        onClick = {
+                            vm.updateFlags(category)
+                        },
+                        label = { Text(category.name) },
+                    )
+                }
+            }
 
             // Image URLs
             Text("Images (URLs)", style = MaterialTheme.typography.titleMedium)
@@ -221,9 +240,9 @@ fun ProductCreateScreen(
                     ) {
                         Box(contentAlignment = Alignment.TopEnd) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    (image.url?.take(20) ?: "") + "...",
-                                    modifier = Modifier.padding(8.dp),
+                                AsyncImage(
+                                    model = image.url,
+                                    contentDescription = null
                                 )
                             }
                             IconButton(
@@ -261,7 +280,7 @@ fun ProductCreateScreen(
             if (state.error != null) {
                 snackbarHostState.showSnackbar(
                     message = state.error!!,
-                    duration = SnackbarDuration.Short
+                    duration = SnackbarDuration.Long,
                 )
                 vm.clearError() // очищаем ошибку после показа
             }

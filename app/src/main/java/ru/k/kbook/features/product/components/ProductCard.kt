@@ -42,6 +42,7 @@ fun ProductCard(
     onNavigate: (Product) -> Unit,
     onDelete: () -> Unit,
 ) {
+    println(product)
     Card(
         modifier = Modifier.fillMaxWidth(),
         onClick = {
@@ -59,11 +60,12 @@ fun ProductCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             val image = product.images.firstOrNull()
+            println(image)
             AsyncImage(
-                model = when {
-                    image == null -> null
-                    image.contentType == ContentType.URL -> image.url
-                    else -> image.image
+                model = when(image?.contentType) {
+                    ContentType.IMAGE -> image.url
+                    ContentType.URL -> image.url
+                    null -> null
                 },
                 contentDescription = product.name,
                 modifier = Modifier

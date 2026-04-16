@@ -175,9 +175,7 @@ fun ProductScreenContent(
             item {
 //                Text("Flags", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 6.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(ProductFlag.entries) { category ->
@@ -194,9 +192,7 @@ fun ProductScreenContent(
             item {
 //                Text("Sort by", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 6.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(SortField.entries) { field ->
@@ -211,9 +207,7 @@ fun ProductScreenContent(
             item {
 //                Text("Sort direction", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 6.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(SortDirection.entries) { direction ->
