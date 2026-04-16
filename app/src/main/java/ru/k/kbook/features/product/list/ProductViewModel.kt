@@ -53,10 +53,6 @@ class ProductViewModel(
     private var originalProducts: List<Product> = emptyList() // Храним оригинальный список
     private var state = ProductListState()
 
-    init {
-        load()
-    }
-
     fun onSearchChange(value: String) {
         state = state.copy(searchQuery = value)
         updateList()
@@ -147,7 +143,7 @@ class ProductViewModel(
             .let(::sortList)
     }
 
-    private fun load() {
+    fun load() {
         viewModelScope.launch {
             val request = ListProductsRequestDto()
             runCatching { repo.listProducts(request) }
