@@ -16,6 +16,7 @@ import ru.k.kbook.api.grpc.schema.ProductImage
 import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.product.ProductRepository
 
+// TODO("нельзя удалить картинку из продукта при редактировании, одна остается обязательно")
 class ProductEditViewModel(
     private val productId: Long,
     private val repository: ProductRepository = ProductRepositoryImpl(),

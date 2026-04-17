@@ -2,19 +2,25 @@ package ru.k.kbook.features.product.list
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,16 +28,18 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -99,6 +107,12 @@ fun ProductScreenContent(
     onCreate: () -> Unit,
     viewModel: ProductViewModel,
 ) {
+
+    val rotation by animateFloatAsState(
+        targetValue = if (state.sortDirection == SortDirection.DESC) 0f else 180f,
+        animationSpec = tween(300)
+    )
+
     Scaffold(
         modifier = Modifier
             .padding(bottom = 80.dp)
@@ -118,7 +132,7 @@ fun ProductScreenContent(
                 .fillMaxSize()
                 .padding(
                     top = padding.calculateTopPadding(),
-                    bottom = padding.calculateBottomPadding()
+                    bottom = padding.calculateBottomPadding(),
                 )
                 .padding(horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -139,7 +153,6 @@ fun ProductScreenContent(
                 )
             }
             item {
-//                Text("Product category", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -156,7 +169,6 @@ fun ProductScreenContent(
                 }
             }
             item {
-//                Text("Cooking Require", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -173,7 +185,6 @@ fun ProductScreenContent(
                 }
             }
             item {
-//                Text("Flags", style = MaterialTheme.typography.labelMedium)
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -190,38 +201,51 @@ fun ProductScreenContent(
                 }
             }
             item {
-//                Text("Sort by", style = MaterialTheme.typography.labelMedium)
-                LazyRow(
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    items(SortField.entries) { field ->
-                        FilterChip(
-                            selected = field == state.sortBy,
-                            onClick = { viewModel.onSort(field, state.sortDirection) },
-                            label = { Text(field.name) },
-                        )
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(0.8f),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        items(SortField.entries) { field ->
+                            FilterChip(
+                                selected = field == state.sortBy,
+                                onClick = { viewModel.onSort(field, state.sortDirection) },
+                                label = { Text(field.name) },
+                            )
+                        }
                     }
-                }
-            }
-            item {
-//                Text("Sort direction", style = MaterialTheme.typography.labelMedium)
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(SortDirection.entries) { direction ->
-                        FilterChip(
-                            selected = direction == state.sortDirection,
-                            onClick = { viewModel.onSort(state.sortBy, direction) },
-                            label = { Text(direction.name) },
+                    IconButton(
+                        onClick = {
+                            when (state.sortDirection) {
+                                SortDirection.ASC -> viewModel.onSort(
+                                    state.sortBy,
+                                    SortDirection.DESC,
+                                )
+
+                                SortDirection.DESC -> viewModel.onSort(
+                                    state.sortBy,
+                                    SortDirection.ASC,
+                                )
+                            }
+                        },
+                    ) {
+                        Icon(
+                            Icons.Default.ArrowDropDown,
+                            null,
+                            modifier = Modifier.rotate(rotation).size(48.dp),
                         )
                     }
                 }
             }
             if (state.products.isNotEmpty()) {
                 item {
-                    Text(text = "${state.products.size} products found.", style = MaterialTheme.typography.labelMedium)
+                    Text(
+                        text = "${state.products.size} products found.",
+                        style = MaterialTheme.typography.labelMedium,
+                    )
                 }
                 items(state.products) { product ->
                     ProductCard(

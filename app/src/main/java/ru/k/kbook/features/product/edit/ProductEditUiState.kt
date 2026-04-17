@@ -5,7 +5,6 @@ import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
 
-// TODO("fix images uploading")
 data class ProductEditUiState(
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
