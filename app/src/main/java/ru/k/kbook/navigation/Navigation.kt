@@ -23,6 +23,7 @@ import androidx.navigation.toRoute
 import ru.k.kbook.features.dish.DishScreen
 import ru.k.kbook.features.product.create.ProductCreateScreen
 import ru.k.kbook.features.product.details.ProductDetailScreen
+import ru.k.kbook.features.product.edit.ProductEditScreen
 import ru.k.kbook.features.product.list.ProductScreen
 
 @Composable
@@ -74,7 +75,9 @@ fun Navigation() {
         NavHost(
             navController = navController,
             startDestination = Screen.Products,
-            modifier = Modifier.padding(top = padding.calculateTopPadding()).fillMaxSize(),
+            modifier = Modifier
+                .padding(top = padding.calculateTopPadding())
+                .fillMaxSize(),
         ) {
             composable<Screen.Products> {
                 ProductScreen(
@@ -88,9 +91,14 @@ fun Navigation() {
                 )
             }
             composable<Screen.ProductDetails> { backStackEntry ->
-                ProductDetailScreen(backStackEntry.toRoute<Screen.ProductDetails>().productId) {
-                    navController.popBackStack()
-                }
+                val id = backStackEntry.toRoute<Screen.ProductDetails>().productId
+                ProductDetailScreen(id,
+                    {
+                        navController.popBackStack()
+                    }, { pid ->
+                        navController.navigate(Screen.ProductEdit(pid))
+                    })
+
             }
             composable<Screen.DishDetail> {
 
@@ -100,6 +108,10 @@ fun Navigation() {
             }
             composable<Screen.DishCreate> {
 
+            }
+            composable<Screen.ProductEdit> { backStackEntry ->
+                val id = backStackEntry.toRoute<Screen.ProductEdit>().productId
+                ProductEditScreen(id) { navController.popBackStack() }
             }
         }
     }

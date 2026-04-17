@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,6 +49,7 @@ import java.time.Instant
 fun ProductDetailScreen(
     id: Long,
     onNavigateBack: () -> Unit,
+    onNavigateToEdit: (Long) -> Unit,
 ) {
     val vm = viewModel<ProductDetailViewModel>(factory = ProductDetailVmFactory(id))
     when (val state = vm.uiState.collectAsStateWithLifecycle().value) {
@@ -68,7 +70,7 @@ fun ProductDetailScreen(
             Text(state.message)
         }
 
-        is ProductDetailUiState.Data -> ProductDetailScreenContent(state.product, onNavigateBack)
+        is ProductDetailUiState.Data -> ProductDetailScreenContent(state.product, onNavigateBack, onNavigateToEdit)
     }
 }
 
@@ -77,6 +79,7 @@ fun ProductDetailScreen(
 fun ProductDetailScreenContent(
     product: Product,
     onNavigateBack: () -> Unit,
+    onNavigateToEdit: (Long) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -89,6 +92,11 @@ fun ProductDetailScreenContent(
                         Icon(Icons.Default.ArrowBack, null)
                     }
                 },
+                actions = {
+                    IconButton(onClick = { onNavigateToEdit(product.id) }) {
+                        Icon(Icons.Default.Edit, null)
+                    }
+                }
             )
         },
     ) { padding ->
@@ -138,6 +146,6 @@ private fun ContentPreview() {
             emptyList(), Instant.now(),
             Instant.now(),
         ),
-        {},
+        {}, {}
     )
 }
