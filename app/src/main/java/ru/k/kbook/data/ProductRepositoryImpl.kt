@@ -1,5 +1,6 @@
 package ru.k.kbook.data
 
+import android.util.Log
 import ru.k.kbook.api.grpc.ProductApi
 import ru.k.kbook.api.grpc.ProductApiImpl
 import ru.k.kbook.api.grpc.request.CreateProductRequestDto
@@ -17,23 +18,33 @@ class ProductRepositoryImpl(
     private val productApi: ProductApi = ProductApiImpl(),
 ) : ProductRepository {
     override suspend fun createProduct(product: CreateProductRequestDto): ProductResponseDto {
-        return productApi.createProduct(product)
+        Log.i("[Repository create]", "$product")
+        val newProduct = productApi.createProduct(product)
+        Log.i("[Repository created]", "$newProduct")
+        return newProduct
     }
 
     override suspend fun getProduct(id: GetProductRequestDto): ProductResponseDto {
-        return productApi.getProduct(id)
+        val product = productApi.getProduct(id)
+        Log.i("[Repository get]", "$product")
+        return product
     }
 
     override suspend fun updateProduct(product: UpdateProductRequestDto): ProductResponseDto {
+        Log.i("[Repository update]", "$product")
         return productApi.updateProduct(product)
     }
 
     override suspend fun deleteProduct(id: DeleteProductRequestDto): DeleteProductResponseDto {
+        Log.i("[Repository delete]", "$id")
         return productApi.deleteProduct(id)
     }
 
     override suspend fun listProducts(params: ListProductsRequestDto): ListProductsResponseDto {
-        return productApi.listProducts(params)
+        Log.i("[Repository getAll]", "$params")
+        val products = productApi.listProducts(params)
+        Log.i("[Repository getAll products]", "${products.products.size}")
+        return products
     }
 
     override suspend fun getProductsForDish(params: GetProductsForDishRequestDto): ListProductsResponseDto {

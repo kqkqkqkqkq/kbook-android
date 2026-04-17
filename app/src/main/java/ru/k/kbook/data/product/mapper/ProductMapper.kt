@@ -1,24 +1,25 @@
 package ru.k.kbook.data.product.mapper
 
+import com.google.protobuf.ByteString
 import com.google.protobuf.kotlin.toByteString
 import ru.k.kbook.api.grpc.request.*
 import ru.k.kbook.api.grpc.response.*
 import ru.k.kbook.api.grpc.schema.*
 import ru.k.kbook_api.grpc.product.*
-import ru.k.kbook_api.grpc.product.ProductDto
 import java.time.Instant
 
 fun CreateProductRequestDto.toGrpc(): CreateProductRequest {
-    println("create request: $this")
     return CreateProductRequest.newBuilder()
         .setName(name)
-        .addAllImages(images.map { img ->
-            ru.k.kbook_api.grpc.product.ImageInput.newBuilder()
-                .setUrl(img.url ?: "")
-                .setImage(img.image?.toByteString() ?: com.google.protobuf.ByteString.EMPTY)
-                .setContentType(img.contentType.toGrpc())
-                .build()
-        })
+        .addAllImages(
+            images.map { img ->
+                ru.k.kbook_api.grpc.product.ImageInput.newBuilder()
+                    .setUrl(img.url ?: "")
+                    .setImage(img.image?.toByteString() ?: com.google.protobuf.ByteString.EMPTY)
+                    .setContentType(img.contentType.toGrpc())
+                    .build()
+            },
+        )
         .setCaloricity(caloricity)
         .setProtein(protein)
         .setFat(fat)
@@ -35,32 +36,33 @@ fun GetProductRequestDto.toGrpc(): GetProductRequest =
         .setId(id).build()
 
 fun UpdateProductRequestDto.toGrpc(): UpdateProductRequest {
-    val categoryDto = this.category
-    val cookingDto = this.cookingRequired
-    val name = this.name
-    return UpdateProductRequest.newBuilder()
+    val builder = UpdateProductRequest.newBuilder()
         .setId(id)
-        .apply {
-            setName(name)
-            if (images != null) {
-                addAllImages(images.map { img ->
-                    ru.k.kbook_api.grpc.product.ImageInput.newBuilder()
-                        .setUrl(img.url ?: "")
-                        .setImage(img.image?.toByteString() ?: com.google.protobuf.ByteString.EMPTY)
-                        .setContentType(img.contentType.toGrpc())
-                        .build()
-                })
-            }
-            setCaloricity(caloricity)
-            setProtein(protein)
-            setFat(fat)
-            setCarb(carb)
-            setCategory(categoryDto?.toGrpc())
-            setCookingRequired(cookingDto?.toGrpc())
-            setDescription(description)
-            addAllFlags(flags?.map { it.toGrpc() })
-        }
-        .build()
+
+    name?.let { builder.setName(it) }
+    caloricity?.let { builder.setCaloricity(it) }
+    protein?.let { builder.setProtein(it) }
+    fat?.let { builder.setFat(it) }
+    carb?.let { builder.setCarb(it) }
+    description?.let { builder.setDescription(it) }
+    category?.let { builder.setCategory(it.toGrpc()) }
+    cookingRequired?.let { builder.setCookingRequired(it.toGrpc()) }
+
+    images?.let { imgs ->
+        builder.addAllImages(imgs.map { img ->
+            ru.k.kbook_api.grpc.product.ImageInput.newBuilder()
+                .setUrl(img.url ?: "")
+                .setImage(img.image?.toByteString() ?: ByteString.EMPTY)
+                .setContentType(img.contentType.toGrpc())
+                .build()
+        })
+    }
+
+    flags?.let { flags ->
+        builder.addAllFlags(flags.map { it.toGrpc() })
+    }
+
+    return builder.build()
 }
 
 fun DeleteProductRequestDto.toGrpc(): DeleteProductRequest =
@@ -91,7 +93,7 @@ fun GetProductsForDishRequestDto.toGrpc(): GetProductsForDishRequest =
         .build()
 
 fun ProductDto.toKotlin(): Product {
-    return Product (
+    return Product(
         id = id,
         name = name,
         images = imagesList.map { img ->
@@ -99,7 +101,7 @@ fun ProductDto.toKotlin(): Product {
                 id = img.id,
                 url = img.url,
                 image = if (img.image.isEmpty) null else img.image.toByteArray(),
-                contentType = ContentType.valueOf(img.contentType.name)
+                contentType = ContentType.valueOf(img.contentType.name),
             )
         },
         caloricity = caloricity,
@@ -111,7 +113,7 @@ fun ProductDto.toKotlin(): Product {
         cookingRequired = CookingRequired.valueOf(cookingRequired.name),
         flags = flagsList.map { ProductFlag.valueOf(it.name) },
         createdAt = Instant.ofEpochSecond(createdAt.seconds),
-        updatedAt = Instant.ofEpochSecond(updatedAt.seconds)
+        updatedAt = Instant.ofEpochSecond(updatedAt.seconds),
     )
 }
 
@@ -119,7 +121,7 @@ fun ProductResponse.toKotlin(): ProductResponseDto {
     return ProductResponseDto(
         product = product.toKotlin(),
         success = success,
-        message = message
+        message = message,
     )
 }
 
@@ -128,7 +130,7 @@ fun ListProductsResponse.toKotlin(): ListProductsResponseDto {
         products = productsList.map { it.toKotlin() },
         totalCount = totalCount,
         success = success,
-        message = message
+        message = message,
     )
 }
 
@@ -136,7 +138,7 @@ fun DeleteProductResponse.toKotlin(): DeleteProductResponseDto {
     return DeleteProductResponseDto(
         success = success,
         message = message,
-        usedInDishes = usedInDishesList
+        usedInDishes = usedInDishesList,
     )
 }
 

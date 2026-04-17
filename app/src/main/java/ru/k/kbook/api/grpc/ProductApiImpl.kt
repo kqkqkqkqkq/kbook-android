@@ -9,12 +9,10 @@ import ru.k.kbook.api.grpc.request.UpdateProductRequestDto
 import ru.k.kbook.api.grpc.response.DeleteProductResponseDto
 import ru.k.kbook.api.grpc.response.ListProductsResponseDto
 import ru.k.kbook.api.grpc.response.ProductResponseDto
-import ru.k.kbook.api.grpc.schema.*
 import ru.k.kbook.config.GrpcChannel
 import ru.k.kbook.data.product.mapper.toGrpc
 import ru.k.kbook.data.product.mapper.toKotlin
 import ru.k.kbook_api.grpc.product.*
-import java.time.Instant
 
 class ProductApiImpl(
     private val channel: GrpcChannel = GrpcChannel(),

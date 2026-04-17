@@ -16,6 +16,7 @@ import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
 import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.product.ProductRepository
+import kotlin.text.isNotBlank
 
 class ProductCreateViewModel(
     private val repository: ProductRepository = ProductRepositoryImpl(),
@@ -84,6 +85,7 @@ class ProductCreateViewModel(
                     name = _uiState.value.name,
                     images = _uiState.value.images.map {
                         ImageInput(
+                            id = it.id,
                             url = it.url?.takeIf(String::isNotBlank),
                             image = it.image,
                             contentType = it.contentType,

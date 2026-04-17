@@ -24,8 +24,7 @@ class ProductDetailViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<ProductDetailUiState>(ProductDetailUiState.Loading)
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
-
-    init {
+    fun load() {
         viewModelScope.launch {
             runCatching { repo.getProduct(GetProductRequestDto(id)) }
                 .onSuccess {

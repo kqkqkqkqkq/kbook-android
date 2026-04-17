@@ -95,6 +95,7 @@ class ProductEditViewModel(
                         name = current.name,
                         images = current.images.map {
                             ImageInput(
+                                id = it.id,
                                 url = it.url?.takeIf(String::isNotBlank),
                                 image = it.image,
                                 contentType = it.contentType
@@ -104,7 +105,7 @@ class ProductEditViewModel(
                         protein = current.protein.toDoubleOrNull(),
                         fat = current.fat.toDoubleOrNull(),
                         carb = current.carb.toDoubleOrNull(),
-                        description = current.description.ifBlank { null },
+                        description = current.description,
                         category = current.category,
                         cookingRequired = current.cookingRequired,
                         flags = current.flags,

@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,6 +53,11 @@ fun ProductDetailScreen(
     onNavigateToEdit: (Long) -> Unit,
 ) {
     val vm = viewModel<ProductDetailViewModel>(factory = ProductDetailVmFactory(id))
+
+    LaunchedEffect(Unit) {
+        vm.load()
+    }
+
     when (val state = vm.uiState.collectAsStateWithLifecycle().value) {
         ProductDetailUiState.Loading -> Column(
             modifier = Modifier.fillMaxSize(),
@@ -81,7 +87,6 @@ fun ProductDetailScreenContent(
     onNavigateBack: () -> Unit,
     onNavigateToEdit: (Long) -> Unit,
 ) {
-    // TODO("create launched effect for loading product")
     Scaffold(
         topBar = {
             TopAppBar(
