@@ -81,6 +81,7 @@ fun ProductDetailScreenContent(
     onNavigateBack: () -> Unit,
     onNavigateToEdit: (Long) -> Unit,
 ) {
+    // TODO("create launched effect for loading product")
     Scaffold(
         topBar = {
             TopAppBar(

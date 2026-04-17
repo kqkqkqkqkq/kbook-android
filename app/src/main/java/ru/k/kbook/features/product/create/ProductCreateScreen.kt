@@ -1,5 +1,7 @@
 package ru.k.kbook.features.product.create
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,20 +42,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil3.compose.AsyncImage
-import kotlinx.coroutines.launch
+import ru.k.kbook.features.product.contextUriToProductImage
+import ru.k.kbook.features.product.ProductImagePreview
 import ru.k.kbook.api.grpc.schema.ContentType
 import ru.k.kbook.api.grpc.schema.CookingRequired
-import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
@@ -65,11 +65,18 @@ fun ProductCreateScreen(
 ) {
     val vm: ProductCreateViewModel = viewModel()
     val state by vm.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     var newImageUrl by remember { mutableStateOf("") }
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        val image = contextUriToProductImage(context, uri)
+        if (image != null) {
+            vm.addImageUrl(image)
+        }
+    }
 
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -142,7 +149,6 @@ fun ProductCreateScreen(
                 maxLines = 4,
             )
 
-            // Category Dropdown
             var expanded by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
                 OutlinedTextField(
@@ -166,7 +172,6 @@ fun ProductCreateScreen(
                 }
             }
 
-            // Cooking Required
             var cookingExpanded by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = cookingExpanded,
@@ -211,8 +216,7 @@ fun ProductCreateScreen(
                 }
             }
 
-            // Image URLs
-            Text("Images (URLs)", style = MaterialTheme.typography.titleMedium)
+            Text("Images", style = MaterialTheme.typography.titleMedium)
             OutlinedTextField(
                 value = newImageUrl,
                 onValueChange = { newImageUrl = it },
@@ -231,6 +235,12 @@ fun ProductCreateScreen(
                 },
                 modifier = Modifier.fillMaxWidth(),
             )
+            Button(
+                onClick = { galleryLauncher.launch("image/*") },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("Add image from gallery")
+            }
 
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(state.images) { image ->
@@ -239,11 +249,12 @@ fun ProductCreateScreen(
                         onClick = { vm.removeImageUrl(image) },
                     ) {
                         Box(contentAlignment = Alignment.TopEnd) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                AsyncImage(
-                                    model = image.url,
-                                    contentDescription = null
-                                )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
+                                ProductImagePreview(image)
                             }
                             IconButton(
                                 modifier = Modifier.size(24.dp),
@@ -275,14 +286,14 @@ fun ProductCreateScreen(
             }
         }
 
-        // Показываем снэкбар при появлении ошибки
         LaunchedEffect(state.error) {
             if (state.error != null) {
                 snackbarHostState.showSnackbar(
                     message = state.error!!,
                     duration = SnackbarDuration.Long,
+                    withDismissAction = true,
                 )
-                vm.clearError() // очищаем ошибку после показа
+                vm.clearError()
             }
         }
     }

@@ -1,6 +1,6 @@
 package ru.k.kbook.features.product.create
 
-import android.util.Log.e
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,9 +16,6 @@ import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
 import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.product.ProductRepository
-import ru.k.kbook_api.grpc.product.CreateProductRequest
-import java.time.Instant
-import kotlin.collections.copy
 
 class ProductCreateViewModel(
     private val repository: ProductRepository = ProductRepositoryImpl(),
@@ -31,11 +28,8 @@ class ProductCreateViewModel(
     }
 
     fun addImageUrl(url: ProductImage) {
-//        if (url.isNotBlank()) {
-            val updated = _uiState.value.images + url
-            // TODO()
-            _uiState.value = _uiState.value.copy(images = updated)
-//        }
+        val updated = _uiState.value.images + url
+        _uiState.value = _uiState.value.copy(images = updated)
     }
 
     fun removeImageUrl(url: ProductImage) {
@@ -83,22 +77,16 @@ class ProductCreateViewModel(
     fun createProduct(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-
-            // Валидация
-            if (_uiState.value.name.isBlank()) {
-                _uiState.value = _uiState.value.copy(error = "Name is required", isLoading = false)
-                return@launch
-            }
+            println("Create product: ${_uiState.value}")
 
             try {
-                // TODO()
                 val product = CreateProductRequestDto(
                     name = _uiState.value.name,
                     images = _uiState.value.images.map {
                         ImageInput(
-                            it.url,
-                            null,
-                            ContentType.URL
+                            url = it.url?.takeIf(String::isNotBlank),
+                            image = it.image,
+                            contentType = it.contentType,
                         )
                     },
                     caloricity = _uiState.value.caloricity.toDoubleOrNull() ?: 0.0,
@@ -110,15 +98,18 @@ class ProductCreateViewModel(
                     cookingRequired = _uiState.value.cookingRequired,
                     flags = _uiState.value.flags,
                 )
-                println(product)
                 val response = repository.createProduct(product)
                 if (response.success) {
                     onSuccess()
+                    Log.e("PRODUCT_CREATE", "success")
                 } else {
                     _uiState.value = _uiState.value.copy(error = response.message, isLoading = false)
+                    Log.e("PRODUCT_CREATE", response.message)
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(error = e.message, isLoading = false)
+                Log.e("PRODUCT_CREATE", e.toString())
+                e.printStackTrace()
             }
         }
     }

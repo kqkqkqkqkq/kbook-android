@@ -23,7 +23,7 @@ fun CreateProductRequestDto.toGrpc(): CreateProductRequest {
         .setProtein(protein)
         .setFat(fat)
         .setCarb(carb)
-        .setDescription(description)
+        .setDescription(description.orEmpty())
         .setCategory(category.toGrpc())
         .setCookingRequired(cookingRequired.toGrpc())
         .addAllFlags(flags.map { it.toGrpc() })
@@ -35,10 +35,13 @@ fun GetProductRequestDto.toGrpc(): GetProductRequest =
         .setId(id).build()
 
 fun UpdateProductRequestDto.toGrpc(): UpdateProductRequest {
+    val categoryDto = this.category
+    val cookingDto = this.cookingRequired
+    val name = this.name
     return UpdateProductRequest.newBuilder()
         .setId(id)
         .apply {
-            name?.let { setName(it) }
+            setName(name)
             if (images != null) {
                 addAllImages(images.map { img ->
                     ru.k.kbook_api.grpc.product.ImageInput.newBuilder()
@@ -48,13 +51,13 @@ fun UpdateProductRequestDto.toGrpc(): UpdateProductRequest {
                         .build()
                 })
             }
-            caloricity.let { setCaloricity(it) }
-            protein.let { setProtein(it) }
-            fat.let { setFat(it) }
-            carb.let { setCarb(it) }
-            description?.let { setDescription(it) }
-            category?.let { setCategory(it) }
-            cookingRequired?.let { setCookingRequired(it) }
+            setCaloricity(caloricity)
+            setProtein(protein)
+            setFat(fat)
+            setCarb(carb)
+            setCategory(categoryDto?.toGrpc())
+            setCookingRequired(cookingDto?.toGrpc())
+            setDescription(description)
             addAllFlags(flags?.map { it.toGrpc() })
         }
         .build()
@@ -77,8 +80,8 @@ fun ListProductsRequestDto.toGrpc(): ListProductsRequest {
         }
         sortBy?.let { setSortBy(it) }
         sortDirection?.let { setSortDirection(it) }
-        limit.let { setLimit(it) }
-        offset.let { setOffset(it) }
+        setLimit(limit)
+        setOffset(offset)
     }.build()
 }
 
@@ -183,59 +186,58 @@ fun SortDirection.toGrpc(): SortDirectionDto =
     when (this) {
         SortDirection.ASC -> SortDirectionDto.ASC
         SortDirection.DESC -> SortDirectionDto.DESC
-        else -> throw IllegalArgumentException("Unrecognized enum value")
     }
 
-fun ProductCategoryDto.toKotlin(): ProductCategoryDto =
+fun ProductCategoryDto.toKotlin(): ProductCategory =
     when (this) {
-        ProductCategoryDto.FROZEN -> ProductCategoryDto.FROZEN
-        ProductCategoryDto.MEAT -> ProductCategoryDto.MEAT
-        ProductCategoryDto.VEGETABLES -> ProductCategoryDto.VEGETABLES
-        ProductCategoryDto.GREENS -> ProductCategoryDto.GREENS
-        ProductCategoryDto.SPICES -> ProductCategoryDto.SPICES
-        ProductCategoryDto.CEREALS -> ProductCategoryDto.CEREALS
-        ProductCategoryDto.CANNED -> ProductCategoryDto.CANNED
-        ProductCategoryDto.LIQUID -> ProductCategoryDto.LIQUID
-        ProductCategoryDto.SWEETS -> ProductCategoryDto.SWEETS
-        else -> ProductCategoryDto.FROZEN
+        ProductCategoryDto.FROZEN -> ProductCategory.FROZEN
+        ProductCategoryDto.MEAT -> ProductCategory.MEAT
+        ProductCategoryDto.VEGETABLES -> ProductCategory.VEGETABLES
+        ProductCategoryDto.GREENS -> ProductCategory.GREENS
+        ProductCategoryDto.SPICES -> ProductCategory.SPICES
+        ProductCategoryDto.CEREALS -> ProductCategory.CEREALS
+        ProductCategoryDto.CANNED -> ProductCategory.CANNED
+        ProductCategoryDto.LIQUID -> ProductCategory.LIQUID
+        ProductCategoryDto.SWEETS -> ProductCategory.SWEETS
+        else -> ProductCategory.FROZEN
     }
 
-fun CookingRequiredDto.toKotlin(): CookingRequiredDto =
+fun CookingRequiredDto.toKotlin(): CookingRequired =
     when (this) {
-        CookingRequiredDto.READY_TO_EAT -> CookingRequiredDto.READY_TO_EAT
-        CookingRequiredDto.SEMI_FINISHED -> CookingRequiredDto.SEMI_FINISHED
-        CookingRequiredDto.REQUIRES_COOKING -> CookingRequiredDto.REQUIRES_COOKING
-        else -> CookingRequiredDto.READY_TO_EAT
+        CookingRequiredDto.READY_TO_EAT -> CookingRequired.READY_TO_EAT
+        CookingRequiredDto.SEMI_FINISHED -> CookingRequired.SEMI_FINISHED
+        CookingRequiredDto.REQUIRES_COOKING -> CookingRequired.REQUIRES_COOKING
+        CookingRequiredDto.UNRECOGNIZED -> throw IllegalArgumentException("Wrong enum value")
     }
 
-fun ProductFlagDto.toKotlin(): ProductFlagDto =
+fun ProductFlagDto.toKotlin(): ProductFlag =
     when (this) {
-        ProductFlagDto.VEGAN -> ProductFlagDto.VEGAN
-        ProductFlagDto.GLUTEN_FREE -> ProductFlagDto.GLUTEN_FREE
-        ProductFlagDto.SUGAR_FREE -> ProductFlagDto.SUGAR_FREE
-        else -> ProductFlagDto.VEGAN
+        ProductFlagDto.VEGAN -> ProductFlag.VEGAN
+        ProductFlagDto.GLUTEN_FREE -> ProductFlag.GLUTEN_FREE
+        ProductFlagDto.SUGAR_FREE -> ProductFlag.SUGAR_FREE
+        else -> ProductFlag.VEGAN
     }
 
-fun ContentTypeDto.toKotlin(): ContentTypeDto =
+fun ContentTypeDto.toKotlin(): ContentType =
     when (this) {
-        ContentTypeDto.IMAGE -> ContentTypeDto.IMAGE
-        ContentTypeDto.URL -> ContentTypeDto.URL
-        else -> ContentTypeDto.IMAGE
+        ContentTypeDto.IMAGE -> ContentType.IMAGE
+        ContentTypeDto.URL -> ContentType.URL
+        else -> ContentType.IMAGE
     }
 
-fun SortFieldDto.toKotlin(): SortFieldDto =
+fun SortFieldDto.toKotlin(): SortField =
     when (this) {
-        SortFieldDto.NAME -> SortFieldDto.NAME
-        SortFieldDto.CALORICITY -> SortFieldDto.CALORICITY
-        SortFieldDto.PROTEIN -> SortFieldDto.PROTEIN
-        SortFieldDto.FAT -> SortFieldDto.FAT
-        SortFieldDto.CARB -> SortFieldDto.CARB
-        else -> SortFieldDto.NAME
+        SortFieldDto.NAME -> SortField.NAME
+        SortFieldDto.CALORICITY -> SortField.CALORICITY
+        SortFieldDto.PROTEIN -> SortField.PROTEIN
+        SortFieldDto.FAT -> SortField.FAT
+        SortFieldDto.CARB -> SortField.CARB
+        else -> SortField.NAME
     }
 
-fun SortDirectionDto.toKotlin(): SortDirectionDto =
+fun SortDirectionDto.toKotlin(): SortDirection =
     when (this) {
-        SortDirectionDto.ASC -> SortDirectionDto.ASC
-        SortDirectionDto.DESC -> SortDirectionDto.DESC
-        else -> SortDirectionDto.ASC
+        SortDirectionDto.ASC -> SortDirection.ASC
+        SortDirectionDto.DESC -> SortDirection.DESC
+        else -> SortDirection.ASC
     }
