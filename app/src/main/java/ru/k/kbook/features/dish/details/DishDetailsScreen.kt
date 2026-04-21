@@ -35,6 +35,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import ru.k.kbook.R
+import ru.k.kbook.features.dish.components.ProductDishCard
+import ru.k.kbook.features.product.components.ProductCard
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,6 +44,7 @@ fun DishDetailsScreen(
     id: Long,
     onNavigateBack: () -> Unit,
     onNavigateToEdit: (Long) -> Unit,
+    onNavigateToProduct: (Long) -> Unit,
 ) {
     val vm = viewModel<DishDetailsViewModel>(factory = DishDetailsVmFactory(id))
     LaunchedEffect(Unit) {
@@ -112,12 +115,18 @@ fun DishDetailsScreen(
                 item { Text("Категория: ${state.dish.category}") }
                 item { Text("Флаги: ${state.dish.flags.joinToString()}") }
                 item { Text("Состав:") }
-                items(state.dish.composition) { product ->
-                    Text(
-                        "- ${product.productName}: ${product.quantity} г",
-                        modifier = Modifier.fillMaxWidth(),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                items(state.products) { product ->
+//                    Text(
+//                        "- ${product.productName}: ${product.quantity} г",
+//                        modifier = Modifier.fillMaxWidth(),
+//                        maxLines = 1,
+//                        overflow = TextOverflow.Ellipsis,
+//                    )
+                    ProductDishCard(
+                        product = product.product,
+                        quantity = product.quantity,
+                        onClick = { onNavigateToProduct(product.product.id) },
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

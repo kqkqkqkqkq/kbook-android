@@ -110,6 +110,7 @@ fun Navigation() {
                     id = id,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateToEdit = { dishId -> navController.navigate(Screen.DishEdit(dishId)) },
+                    onNavigateToProduct = { productId -> navController.navigate(Screen.ProductDetails(productId)) },
                 )
             }
             composable<Screen.ProductCreate> {

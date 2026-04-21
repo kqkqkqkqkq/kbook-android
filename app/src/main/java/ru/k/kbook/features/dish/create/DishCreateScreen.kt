@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -79,8 +81,7 @@ fun DishCreateScreen(
         snackbarHost = { SnackbarHost(snackbar) }
     ) { padding ->
         if (state.isLoading) {
-            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) { CircularProgressIndicator() }
-            return@Scaffold
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         }
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(padding).padding(16.dp),
@@ -101,16 +102,43 @@ fun DishCreateScreen(
                 OutlinedTextField(state.fat, vm::updateFat, label = { Text("Ж (draft: ${state.autoFat})") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f))
                 OutlinedTextField(state.carb, vm::updateCarb, label = { Text("У (draft: ${state.autoCarb})") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f))
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                ExposedDropdownMenuBox(expanded = productExpanded, onExpandedChange = { productExpanded = !productExpanded }, modifier = Modifier.weight(1f)) {
-                    OutlinedTextField(readOnly = true, value = state.products.firstOrNull { it.id == state.selectedProductId }?.name ?: "Продукт", onValueChange = {}, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(productExpanded) }, modifier = Modifier.menuAnchor().fillMaxWidth())
-                    ExposedDropdownMenu(expanded = productExpanded, onDismissRequest = { productExpanded = false }) {
-                        state.products.forEach { p -> DropdownMenuItem(text = { Text(p.name) }, onClick = { vm.updateSelectedProduct(p.id); productExpanded = false }) }
+            Row {
+                ExposedDropdownMenuBox(
+                    expanded = productExpanded,
+                    onExpandedChange = { productExpanded = !productExpanded },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    OutlinedTextField(
+                        readOnly = true,
+                        value = state.products.firstOrNull { it.id == state.selectedProductId }?.name
+                            ?: "Продукт",
+                        onValueChange = {},
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(productExpanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = productExpanded,
+                        onDismissRequest = { productExpanded = false }) {
+                        state.products.forEach { p ->
+                            DropdownMenuItem(
+                                text = { Text(p.name) },
+                                onClick = {
+                                    vm.updateSelectedProduct(p.id); productExpanded = false
+                                })
+                        }
                     }
                 }
-                OutlinedTextField(state.selectedQuantity, vm::updateSelectedQuantity, label = { Text("Граммы") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f))
-                Button(onClick = vm::addCompositionItem) { Text("Добавить") }
             }
+            Row {
+                OutlinedTextField(
+                    state.selectedQuantity,
+                    vm::updateSelectedQuantity,
+                    label = { Text("Граммы") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Button(onClick = vm::addCompositionItem) { Text("Добавить") }
             state.composition.forEachIndexed { i, item ->
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text("${item.productName}: ${item.quantity} г")

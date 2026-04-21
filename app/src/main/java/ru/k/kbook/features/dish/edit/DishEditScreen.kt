@@ -85,8 +85,7 @@ fun DishEditScreen(
         snackbarHost = { SnackbarHost(snackbar) }
     ) { padding ->
         if (state.isLoading) {
-            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) { CircularProgressIndicator() }
-            return@Scaffold
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         }
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(padding).padding(16.dp),
@@ -107,13 +106,42 @@ fun DishEditScreen(
                 OutlinedTextField(state.fat, vm::updateFat, label = { Text("Ж (draft: ${state.autoFat})") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f))
                 OutlinedTextField(state.carb, vm::updateCarb, label = { Text("У (draft: ${state.autoCarb})") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f))
             }
-            ExposedDropdownMenuBox(expanded = productExpanded, onExpandedChange = { productExpanded = !productExpanded }, modifier = Modifier.weight(1f)) {
-                OutlinedTextField(readOnly = true, value = state.products.firstOrNull { it.id == state.selectedProductId }?.name ?: "Продукт", onValueChange = {}, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(productExpanded) }, modifier = Modifier.menuAnchor().fillMaxWidth())
-                ExposedDropdownMenu(expanded = productExpanded, onDismissRequest = { productExpanded = false }) {
-                    state.products.forEach { p -> DropdownMenuItem(text = { Text(p.name) }, onClick = { vm.updateSelectedProduct(p.id); productExpanded = false }) }
+            Row {
+                ExposedDropdownMenuBox(
+                    expanded = productExpanded,
+                    onExpandedChange = { productExpanded = !productExpanded },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    OutlinedTextField(
+                        readOnly = true,
+                        value = state.products.firstOrNull { it.id == state.selectedProductId }?.name
+                            ?: "Продукт",
+                        onValueChange = {},
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(productExpanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = productExpanded,
+                        onDismissRequest = { productExpanded = false }) {
+                        state.products.forEach { p ->
+                            DropdownMenuItem(
+                                text = { Text(p.name) },
+                                onClick = {
+                                    vm.updateSelectedProduct(p.id); productExpanded = false
+                                })
+                        }
+                    }
                 }
             }
-            OutlinedTextField(state.selectedQuantity, vm::updateSelectedQuantity, label = { Text("Граммы") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f))
+            Row {
+                OutlinedTextField(
+                    state.selectedQuantity,
+                    vm::updateSelectedQuantity,
+                    label = { Text("Граммы") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.weight(1f)
+                )
+            }
             Button(onClick = vm::addCompositionItem) { Text("Добавить") }
             state.composition.forEachIndexed { i, item ->
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -141,7 +169,7 @@ fun DishEditScreen(
                             .size(64.dp),
                     ) {
                         AsyncImage(
-                            model = if (image.contentType == "URL") image.url else image.image,
+                            model = if (image.contentType == "url") image.url else image.image,
                             contentDescription = null,
                             modifier = Modifier
                                 .fillMaxSize()
