@@ -1,6 +1,8 @@
 package ru.k.kbook.data
 
 import android.util.Log
+import io.grpc.StatusException
+import io.grpc.StatusRuntimeException
 import ru.k.kbook.api.grpc.DishApi
 import ru.k.kbook.api.grpc.DishApiImpl
 import ru.k.kbook.api.grpc.request.CreateDishRequestDto

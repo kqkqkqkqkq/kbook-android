@@ -21,6 +21,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import ru.k.kbook.features.dish.DishScreen
+import ru.k.kbook.features.dish.create.DishCreateScreen
+import ru.k.kbook.features.dish.details.DishDetailsScreen
+import ru.k.kbook.features.dish.edit.DishEditScreen
 import ru.k.kbook.features.product.create.ProductCreateScreen
 import ru.k.kbook.features.product.details.ProductDetailScreen
 import ru.k.kbook.features.product.edit.ProductEditScreen
@@ -88,6 +91,7 @@ fun Navigation() {
             composable<Screen.Dishes> {
                 DishScreen(
                     onDetail = { dish -> navController.navigate(Screen.DishDetail(dish.id)) },
+                    onCreate = { navController.navigate(Screen.DishCreate) },
                 )
             }
             composable<Screen.ProductDetails> { backStackEntry ->
@@ -100,18 +104,27 @@ fun Navigation() {
                     })
 
             }
-            composable<Screen.DishDetail> {
-
+            composable<Screen.DishDetail> { backStackEntry ->
+                val id = backStackEntry.toRoute<Screen.DishDetail>().dishId
+                DishDetailsScreen(
+                    id = id,
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToEdit = { dishId -> navController.navigate(Screen.DishEdit(dishId)) },
+                )
             }
             composable<Screen.ProductCreate> {
                 ProductCreateScreen { navController.popBackStack() }
             }
             composable<Screen.DishCreate> {
-
+                DishCreateScreen(onNavigateBack = { navController.popBackStack() })
             }
             composable<Screen.ProductEdit> { backStackEntry ->
                 val id = backStackEntry.toRoute<Screen.ProductEdit>().productId
                 ProductEditScreen(id) { navController.popBackStack() }
+            }
+            composable<Screen.DishEdit> { backStackEntry ->
+                val id = backStackEntry.toRoute<Screen.DishEdit>().dishId
+                DishEditScreen(id = id, onNavigateBack = { navController.popBackStack() })
             }
         }
     }

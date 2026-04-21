@@ -12,4 +12,5 @@ sealed class Screen {
     @Serializable data object Dishes : Screen()
     @Serializable data object DishCreate : Screen()
     @Serializable data class DishDetail(val dishId: Long) : Screen()
+    @Serializable data class DishEdit(val dishId: Long) : Screen()
 }

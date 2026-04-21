@@ -3,7 +3,6 @@ package ru.k.kbook.features.dish
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
@@ -21,7 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,11 +31,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.k.kbook.api.grpc.schema.Dish
 import ru.k.kbook.api.grpc.schema.DishCategory
 import ru.k.kbook.api.grpc.schema.DishFlag
+import ru.k.kbook.features.dish.components.DishCard
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun DishScreen(
     onDetail: (Dish) -> Unit,
+    onCreate: () -> Unit,
 ) {
     val vm = viewModel<DishViewModel>()
     val context = LocalContext.current
@@ -52,7 +51,7 @@ fun DishScreen(
     when (val state = vm.uiState.collectAsStateWithLifecycle().value) {
         DishListUiState.Loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Loading") }
         is DishListUiState.Error -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(state.message) }
-        is DishListUiState.Data -> DishListContent(state.value, onDetail, vm)
+        is DishListUiState.Data -> DishListContent(state.value, onDetail, onCreate, vm)
     }
 }
 
@@ -61,6 +60,7 @@ fun DishScreen(
 private fun DishListContent(
     state: DishListState,
     onDetail: (Dish) -> Unit,
+    onCreate: () -> Unit,
     vm: DishViewModel,
 ) {
     Scaffold(
@@ -70,9 +70,7 @@ private fun DishListContent(
         topBar = { TopAppBar(title = { Text("Dishes") }) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    // TODO("on create dish")
-                },
+                onClick = onCreate,
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
             }
@@ -108,15 +106,7 @@ private fun DishListContent(
                     }
                 }
                 items(state.dishes) { dish ->
-                    Card(onClick = { onDetail(dish) }, modifier = Modifier.fillMaxWidth()) {
-                        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(dish.name)
-                            Text("${dish.caloricity} kcal/portion")
-                            Text("portion: ${dish.portionSize}")
-                            Text("flags: ${dish.flags.joinToString()}")
-                            TextButton(onClick = { vm.delete(dish.id) }) { Text("Delete") }
-                        }
-                    }
+                    DishCard(dish = dish, onClick = onDetail, onDelete = { vm.delete(it.id) })
                 }
             }
     }
