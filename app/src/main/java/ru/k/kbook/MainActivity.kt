@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import dagger.hilt.android.AndroidEntryPoint
 import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.navigation.Navigation
 import ru.k.kbook.ui.theme.KbookandroidTheme
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

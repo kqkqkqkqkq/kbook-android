@@ -52,6 +52,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
@@ -60,7 +61,6 @@ import ru.k.kbook.api.grpc.schema.ContentType
 import ru.k.kbook.api.grpc.schema.DishCategory
 import ru.k.kbook.api.grpc.schema.DishFlag
 import ru.k.kbook.api.grpc.schema.DishImage
-import ru.k.kbook_api.grpc.dish.dish
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,7 +68,7 @@ fun DishEditScreen(
     id: Long,
     onNavigateBack: () -> Unit,
 ) {
-    val vm = viewModel<DishEditViewModel>(factory = DishEditVmFactory(id))
+    val vm = hiltViewModel<DishEditViewModel>()
     val state by vm.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
@@ -78,6 +78,10 @@ fun DishEditScreen(
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         val bytes = uri?.let { context.contentResolver.openInputStream(it)?.use { stream -> stream.readBytes() } } ?: return@rememberLauncherForActivityResult
         vm.addImage(DishImage(0L, null, bytes, "IMAGE"))
+    }
+
+    LaunchedEffect(Unit) {
+        vm.load(id)
     }
 
     Scaffold(
@@ -187,7 +191,7 @@ fun DishEditScreen(
                     }
                 }
             }
-            Button(onClick = { vm.save(onNavigateBack) }, enabled = !state.isSaving, modifier = Modifier.fillMaxWidth()) { Text("Сохранить") }
+            Button(onClick = { vm.save(id, onNavigateBack) }, enabled = !state.isSaving, modifier = Modifier.fillMaxWidth()) { Text("Сохранить") }
         }
     }
     LaunchedEffect(state.error) { state.error?.let { snackbar.showSnackbar(it); vm.clearError() } }

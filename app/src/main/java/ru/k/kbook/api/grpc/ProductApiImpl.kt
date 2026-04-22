@@ -13,9 +13,12 @@ import ru.k.kbook.config.GrpcChannel
 import ru.k.kbook.data.product.mapper.toGrpc
 import ru.k.kbook.data.product.mapper.toKotlin
 import ru.k.kbook_api.grpc.product.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ProductApiImpl(
-    private val channel: GrpcChannel = GrpcChannel(),
+@Singleton
+class ProductApiImpl @Inject constructor (
+    private val channel: GrpcChannel,
 ) : ProductApi {
     private val stub by lazy {
         ProductServiceGrpcKt.ProductServiceCoroutineStub(channel.channel)

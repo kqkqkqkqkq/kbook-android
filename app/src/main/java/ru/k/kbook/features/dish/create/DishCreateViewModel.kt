@@ -21,11 +21,12 @@ import ru.k.kbook.features.dish.components.calculateAutoNutrition
 import ru.k.kbook.features.dish.components.computeAvailableFlags
 import ru.k.kbook.features.dish.components.parseCategoryMacro
 import ru.k.kbook.features.dish.components.toDishProducts
+import javax.inject.Inject
 import kotlin.math.round
 
-class DishCreateViewModel(
-    private val dishRepo: DishRepository = DishRepositoryImpl(),
-    private val productRepo: ProductRepository = ProductRepositoryImpl(),
+class DishCreateViewModel @Inject constructor (
+    private val dishRepo: DishRepository,
+    private val productRepo: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DishFormState(isLoading = true))
     val uiState: StateFlow<DishFormState> = _uiState

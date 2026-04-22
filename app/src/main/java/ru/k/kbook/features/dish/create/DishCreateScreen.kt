@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
@@ -59,7 +60,7 @@ import ru.k.kbook.api.grpc.schema.DishImage
 fun DishCreateScreen(
     onNavigateBack: () -> Unit,
 ) {
-    val vm = viewModel<DishCreateViewModel>()
+    val vm = hiltViewModel<DishCreateViewModel>()
     val state by vm.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }

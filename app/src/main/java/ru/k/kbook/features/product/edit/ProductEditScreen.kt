@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.k.kbook.api.grpc.schema.ContentType
@@ -61,11 +62,15 @@ fun ProductEditScreen(
     id: Long,
     onNavigateBack: () -> Unit,
 ) {
-    val vm = viewModel<ProductEditViewModel>(factory = ProductEditVmFactory(id))
+    val vm = hiltViewModel<ProductEditViewModel>()
     val state by vm.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     var newImageUrl by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        vm.loadProduct(id)
+    }
 
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri ?: return@rememberLauncherForActivityResult
@@ -267,7 +272,7 @@ fun ProductEditScreen(
             }
 
             Button(
-                onClick = { vm.save(onNavigateBack) },
+                onClick = { vm.save(id, onNavigateBack) },
                 enabled = !state.isSaving,
                 modifier = Modifier.fillMaxWidth(),
             ) {

@@ -2,6 +2,7 @@ package ru.k.kbook.features.product.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -19,6 +20,7 @@ import ru.k.kbook.api.grpc.schema.SortDirection
 import ru.k.kbook.api.grpc.schema.SortField
 import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.product.ProductRepository
+import javax.inject.Inject
 
 sealed class ProductListUiState {
     data object Loading : ProductListUiState()
@@ -41,8 +43,9 @@ data class ProductListState(
     val products: List<Product> = emptyList(),
 )
 
-class ProductViewModel(
-    private val repo: ProductRepository = ProductRepositoryImpl(),
+@HiltViewModel
+class ProductViewModel @Inject constructor(
+    private val repo: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<ProductListUiState>(ProductListUiState.Loading)
     val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
@@ -59,13 +62,15 @@ class ProductViewModel(
     }
 
     fun onCategoryToggle(value: ProductCategory) {
-        val selected = if (value in state.categories) state.categories - value else state.categories + value
+        val selected =
+            if (value in state.categories) state.categories - value else state.categories + value
         state = state.copy(categories = selected)
         updateList()
     }
 
     fun onCookingToggle(value: CookingRequired) {
-        val selected = if (value in state.cookingRequired) state.cookingRequired - value else state.cookingRequired + value
+        val selected =
+            if (value in state.cookingRequired) state.cookingRequired - value else state.cookingRequired + value
         state = state.copy(cookingRequired = selected)
         updateList()
     }

@@ -3,13 +3,12 @@ import com.google.protobuf.gradle.id
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-//    alias(libs.plugins.protobuf)
     id("com.google.protobuf")
     alias(libs.plugins.kotlin.android)
     kotlin("plugin.serialization") version "2.0.21"
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
-
-//kotlin { jvmToolchain(21) }
 
 android {
     namespace = "ru.k.kbook"
@@ -44,11 +43,15 @@ android {
     sourceSets {
         getByName("main") {
             java.srcDirs(
+                "src/main/java",
+                "src/main/kotlin",
                 "build/generated/source/proto/debug/java",
                 "build/generated/source/proto/debug/grpc",
                 "build/generated/source/proto/debug/grpcKt",
-                "build/generated/source/proto/debug/kotlin"
+                "build/generated/source/proto/debug/kotlin",
+                "build/generated/ksp/debug/java"
             )
+            kotlin.srcDirs("src/main/java")
         }
     }
 }
@@ -121,4 +124,9 @@ dependencies {
     // Coil
     implementation("io.coil-kt.coil3:coil-compose:3.4.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.4.0")
+
+    // Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
 }

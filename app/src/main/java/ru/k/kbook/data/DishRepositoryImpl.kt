@@ -15,9 +15,12 @@ import ru.k.kbook.api.grpc.response.DishListResponseDto
 import ru.k.kbook.api.grpc.response.DishResponseDto
 import ru.k.kbook.api.grpc.response.ValidateDishResponseDto
 import ru.k.kbook.domain.dish.DishRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class DishRepositoryImpl(
-    private val api: DishApi = DishApiImpl(),
+@Singleton
+class DishRepositoryImpl @Inject constructor(
+    private val api: DishApi,
 ) : DishRepository {
     override suspend fun createDish(request: CreateDishRequestDto): DishResponseDto {
         Log.i("DishRepository", "createDish called with request: $request")

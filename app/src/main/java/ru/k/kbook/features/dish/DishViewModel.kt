@@ -2,6 +2,7 @@ package ru.k.kbook.features.dish
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -16,6 +17,7 @@ import ru.k.kbook.api.grpc.schema.DishCategory
 import ru.k.kbook.api.grpc.schema.DishFlag
 import ru.k.kbook.data.DishRepositoryImpl
 import ru.k.kbook.domain.dish.DishRepository
+import javax.inject.Inject
 
 sealed class DishListUiState {
     data object Loading : DishListUiState()
@@ -35,8 +37,9 @@ sealed class DishEvent {
     data class Message(val text: String) : DishEvent()
 }
 
-class DishViewModel(
-    private val repo: DishRepository = DishRepositoryImpl(),
+@HiltViewModel
+class DishViewModel @Inject constructor (
+    private val repo: DishRepository,
 ) : ViewModel() {
     private var state = DishListState()
     private val _uiState = MutableStateFlow<DishListUiState>(DishListUiState.Loading)
@@ -44,9 +47,6 @@ class DishViewModel(
     private val _events = MutableSharedFlow<DishEvent>()
     val events: SharedFlow<DishEvent> = _events.asSharedFlow()
 
-    init {
-        load()
-    }
 
     fun onSearch(value: String) {
         state = state.copy(search = value)
@@ -78,7 +78,7 @@ class DishViewModel(
         }
     }
 
-    private fun load() {
+    fun load() {
         viewModelScope.launch {
             runCatching {
                 repo.listDishes(

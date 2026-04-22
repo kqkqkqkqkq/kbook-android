@@ -1,5 +1,6 @@
 package ru.k.kbook.api.grpc
 
+import jakarta.inject.Inject
 import ru.k.kbook.api.grpc.request.CreateDishRequestDto
 import ru.k.kbook.api.grpc.request.DeleteDishRequestDto
 import ru.k.kbook.api.grpc.request.GetDishRequestDto
@@ -14,9 +15,12 @@ import ru.k.kbook.data.dish.mapper.toGrpc
 import ru.k.kbook.data.dish.mapper.toKotlin
 import ru.k.kbook.data.dish.mapper.toResponse
 import ru.k.kbook_api.grpc.dish.DishServiceGrpcKt
+import javax.inject.Singleton
+import kotlin.getValue
 
-class DishApiImpl(
-    private val channel: GrpcChannel = GrpcChannel(),
+@Singleton
+class DishApiImpl @Inject constructor (
+    private val channel: GrpcChannel,
 ) : DishApi {
     private val stub by lazy { DishServiceGrpcKt.DishServiceCoroutineStub(channel.channel) }
 

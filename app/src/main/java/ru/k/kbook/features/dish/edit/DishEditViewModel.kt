@@ -3,6 +3,7 @@ package ru.k.kbook.features.dish.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -23,20 +24,20 @@ import ru.k.kbook.features.dish.components.calculateAutoNutrition
 import ru.k.kbook.features.dish.components.computeAvailableFlags
 import ru.k.kbook.features.dish.components.parseCategoryMacro
 import ru.k.kbook.features.dish.components.toDishProducts
+import javax.inject.Inject
 import kotlin.math.round
 
-class DishEditViewModel(
-    private val dishId: Long,
-    private val dishRepo: DishRepository = DishRepositoryImpl(),
-    private val productRepo: ProductRepository = ProductRepositoryImpl(),
+@HiltViewModel
+class DishEditViewModel @Inject constructor (
+    private val dishRepo: DishRepository,
+    private val productRepo: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DishFormState(isLoading = true))
     val uiState: StateFlow<DishFormState> = _uiState
     private var nutritionManuallyEdited = false
 
-    init { load() }
 
-    private fun load() {
+    fun load(dishId: Long) {
         viewModelScope.launch {
             runCatching { productRepo.listProducts(ListProductsRequestDto()).products }
                 .onSuccess { products ->
@@ -115,7 +116,7 @@ class DishEditViewModel(
         )
     }
 
-    fun save(onSuccess: () -> Unit) {
+    fun save(dishId: Long, onSuccess: () -> Unit) {
         val s = _uiState.value
         val portion = s.portionSize.toDoubleOrNull()
         val p = s.protein.toDoubleOrNull()
@@ -150,7 +151,3 @@ class DishEditViewModel(
 
 private fun Set<DishFlag>.toggle(flag: DishFlag): Set<DishFlag> = if (flag in this) this - flag else this + flag
 private fun Double.round1(): String = (round(this * 10.0) / 10.0).toString()
-
-class DishEditVmFactory(private val dishId: Long) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T = DishEditViewModel(dishId) as T
-}

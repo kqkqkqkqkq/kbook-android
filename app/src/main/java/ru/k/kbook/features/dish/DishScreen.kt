@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.k.kbook.api.grpc.schema.Dish
@@ -39,7 +40,7 @@ fun DishScreen(
     onDetail: (Dish) -> Unit,
     onCreate: () -> Unit,
 ) {
-    val vm = viewModel<DishViewModel>()
+    val vm = hiltViewModel<DishViewModel>()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         vm.events.collect { event ->
@@ -47,6 +48,9 @@ fun DishScreen(
                 is DishEvent.Message -> Toast.makeText(context, event.text, Toast.LENGTH_SHORT).show()
             }
         }
+    }
+    LaunchedEffect(Unit) {
+        vm.load()
     }
     when (val state = vm.uiState.collectAsStateWithLifecycle().value) {
         DishListUiState.Loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Loading") }

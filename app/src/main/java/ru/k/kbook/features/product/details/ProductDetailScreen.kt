@@ -36,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -53,10 +54,10 @@ fun ProductDetailScreen(
     onNavigateBack: () -> Unit,
     onNavigateToEdit: (Long) -> Unit,
 ) {
-    val vm = viewModel<ProductDetailViewModel>(factory = ProductDetailVmFactory(id))
+    val vm = hiltViewModel<ProductDetailViewModel>()
 
     LaunchedEffect(Unit) {
-        vm.load()
+        vm.load(id)
     }
 
     when (val state = vm.uiState.collectAsStateWithLifecycle().value) {

@@ -13,9 +13,12 @@ import ru.k.kbook.api.grpc.response.DeleteProductResponseDto
 import ru.k.kbook.api.grpc.response.ListProductsResponseDto
 import ru.k.kbook.api.grpc.response.ProductResponseDto
 import ru.k.kbook.domain.product.ProductRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ProductRepositoryImpl(
-    private val productApi: ProductApi = ProductApiImpl(),
+@Singleton
+class ProductRepositoryImpl @Inject constructor (
+    private val productApi: ProductApi,
 ) : ProductRepository {
     override suspend fun createProduct(product: CreateProductRequestDto): ProductResponseDto {
         Log.i("[Repository create]", "$product")

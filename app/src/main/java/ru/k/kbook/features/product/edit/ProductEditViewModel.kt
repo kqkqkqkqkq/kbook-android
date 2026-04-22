@@ -15,20 +15,16 @@ import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
 import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.product.ProductRepository
+import javax.inject.Inject
 
 // TODO("нельзя удалить картинку из продукта при редактировании, одна остается обязательно")
-class ProductEditViewModel(
-    private val productId: Long,
-    private val repository: ProductRepository = ProductRepositoryImpl(),
+class ProductEditViewModel @Inject constructor(
+    private val repository: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductEditUiState())
     val uiState: StateFlow<ProductEditUiState> = _uiState
 
-    init {
-        loadProduct()
-    }
-
-    private fun loadProduct() {
+    fun loadProduct(productId: Long) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             runCatching {
@@ -83,7 +79,7 @@ class ProductEditViewModel(
     fun addImage(image: ProductImage) = update { it.copy(images = it.images + image) }
     fun removeImage(image: ProductImage) = update { it.copy(images = it.images - image) }
 
-    fun save(onSuccess: () -> Unit) {
+    fun save(productId: Long, onSuccess: () -> Unit) {
         val current = _uiState.value
         println("Current product: $current")
 
@@ -131,11 +127,4 @@ class ProductEditViewModel(
     private fun update(reducer: (ProductEditUiState) -> ProductEditUiState) {
         _uiState.value = reducer(_uiState.value)
     }
-}
-
-class ProductEditVmFactory(
-    private val productId: Long,
-) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T = ProductEditViewModel(productId) as T
 }

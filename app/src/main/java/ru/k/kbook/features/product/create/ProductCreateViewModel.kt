@@ -3,6 +3,7 @@ package ru.k.kbook.features.product.create
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -16,10 +17,12 @@ import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
 import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.product.ProductRepository
+import javax.inject.Inject
 import kotlin.text.isNotBlank
 
-class ProductCreateViewModel(
-    private val repository: ProductRepository = ProductRepositoryImpl(),
+@HiltViewModel
+class ProductCreateViewModel @Inject constructor (
+    private val repository: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductCreateUiState())
     val uiState: StateFlow<ProductCreateUiState> = _uiState

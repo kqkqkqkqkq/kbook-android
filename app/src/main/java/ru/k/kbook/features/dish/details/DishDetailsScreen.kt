@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -46,9 +47,9 @@ fun DishDetailsScreen(
     onNavigateToEdit: (Long) -> Unit,
     onNavigateToProduct: (Long) -> Unit,
 ) {
-    val vm = viewModel<DishDetailsViewModel>(factory = DishDetailsVmFactory(id))
+    val vm = hiltViewModel<DishDetailsViewModel>()
     LaunchedEffect(Unit) {
-        vm.load()
+        vm.load(id)
     }
     when (val state = vm.uiState.collectAsStateWithLifecycle().value) {
         DishDetailsUiState.Loading -> Column(

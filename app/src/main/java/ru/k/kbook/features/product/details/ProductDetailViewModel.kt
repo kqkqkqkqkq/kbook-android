@@ -3,6 +3,7 @@ package ru.k.kbook.features.product.details
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,6 +12,7 @@ import ru.k.kbook.api.grpc.request.GetProductRequestDto
 import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.product.ProductRepository
+import javax.inject.Inject
 
 sealed class ProductDetailUiState {
     data object Loading : ProductDetailUiState()
@@ -18,13 +20,13 @@ sealed class ProductDetailUiState {
     data class Error(val message: String) : ProductDetailUiState()
 }
 
-class ProductDetailViewModel(
-    private val id: Long,
-    private val repo: ProductRepository = ProductRepositoryImpl(),
+@HiltViewModel
+class ProductDetailViewModel @Inject constructor (
+    private val repo: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<ProductDetailUiState>(ProductDetailUiState.Loading)
     val uiState: StateFlow<ProductDetailUiState> = _uiState.asStateFlow()
-    fun load() {
+    fun load(id: Long) {
         viewModelScope.launch {
             runCatching { repo.getProduct(GetProductRequestDto(id)) }
                 .onSuccess {
@@ -35,11 +37,4 @@ class ProductDetailViewModel(
                 .onFailure { _uiState.value = ProductDetailUiState.Error(it.message ?: "Load failed") }
         }
     }
-}
-
-@Suppress("UNCHECKED_CAST")
-class ProductDetailVmFactory(
-    private val id: Long,
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T = ProductDetailViewModel(id) as T
 }

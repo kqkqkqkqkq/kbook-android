@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.k.kbook.api.grpc.schema.CookingRequired
@@ -58,7 +59,7 @@ fun ProductScreen(
     onNavigate: (Product) -> Unit,
     onCreate: () -> Unit,
 ) {
-    val viewModel = viewModel<ProductViewModel>()
+    val viewModel = hiltViewModel<ProductViewModel>()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -273,11 +274,4 @@ fun ProductScreenEmpty() {
     ) {
         Text("Products are empty")
     }
-}
-
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview(showBackground = true)
-@Composable
-fun ProductScreenContentPreview() {
-    ProductScreenContent(state = ProductListState(), {}, {}, ProductViewModel())
 }

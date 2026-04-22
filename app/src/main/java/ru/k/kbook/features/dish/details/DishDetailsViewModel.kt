@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.grpc.StatusException
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +19,7 @@ import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.dish.DishRepository
 import ru.k.kbook.domain.product.ProductRepository
 import ru.k.kbook.features.dish.components.ProductWithQuantity
+import javax.inject.Inject
 import kotlin.code
 
 sealed class DishDetailsUiState {
@@ -26,15 +28,15 @@ sealed class DishDetailsUiState {
     data class Data(val dish: Dish,val products: List<ProductWithQuantity>) : DishDetailsUiState()
 }
 
-class DishDetailsViewModel(
-    private val dishId: Long,
-    private val dishRepo: DishRepository = DishRepositoryImpl(),
-    private val productRepo: ProductRepository = ProductRepositoryImpl(),
+@HiltViewModel
+class DishDetailsViewModel @Inject constructor (
+    private val dishRepo: DishRepository,
+    private val productRepo: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<DishDetailsUiState>(DishDetailsUiState.Loading)
     val uiState: StateFlow<DishDetailsUiState> = _uiState.asStateFlow()
 
-    fun load() {
+    fun load(dishId: Long) {
         if (dishId <= 0L) {
             _uiState.value = DishDetailsUiState.Error("Некорректный id блюда: $dishId")
             return
@@ -73,8 +75,4 @@ class DishDetailsViewModel(
                 }
         }
     }
-}
-
-class DishDetailsVmFactory(private val dishId: Long) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T = DishDetailsViewModel(dishId) as T
 }
