@@ -8,6 +8,7 @@ plugins {
     kotlin("plugin.serialization") version "2.0.21"
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    id("org.jetbrains.kotlinx.kover") version "0.9.8"
 }
 
 android {
@@ -40,20 +41,20 @@ android {
     buildFeatures {
         compose = true
     }
-    sourceSets {
-        getByName("main") {
-            java.srcDirs(
-                "src/main/java",
-                "src/main/kotlin",
-                "build/generated/source/proto/debug/java",
-                "build/generated/source/proto/debug/grpc",
-                "build/generated/source/proto/debug/grpcKt",
-                "build/generated/source/proto/debug/kotlin",
-                "build/generated/ksp/debug/java"
-            )
-            kotlin.srcDirs("src/main/java")
-        }
-    }
+//    sourceSets {
+//        getByName("main") {
+//            java.srcDirs(
+//                "src/main/java",
+//                "src/main/kotlin",
+//                "build/generated/source/proto/debug/java",
+//                "build/generated/source/proto/debug/grpc",
+//                "build/generated/source/proto/debug/grpcKt",
+//                "build/generated/source/proto/debug/kotlin",
+//                "build/generated/ksp/debug/java"
+//            )
+//            kotlin.srcDirs("src/main/java")
+//        }
+//    }
 }
 
 protobuf {
@@ -84,6 +85,41 @@ protobuf {
     }
 }
 
+val aspectJVersion = "1.9.21"
+
+val agent: Configuration by configurations.creating {
+    isCanBeConsumed = true
+    isCanBeResolved = true
+}
+
+kover {
+    reports {
+        total {
+            html {
+                onCheck = true
+                htmlDir = file("build/reports/kover/html")
+            }
+        }
+    }
+}
+
+tasks.withType<Test> {
+    val agentJar = configurations.getByName("agent").asPath
+
+    jvmArgs = listOf(
+        "-javaagent:${agentJar}",
+        "-XX:+EnableDynamicAgentLoading",
+        "-Djdk.instrument.traceUsage=false"
+    )
+
+    systemProperty("allure.results.directory", "${project.buildDir}/allure-results")
+
+    doFirst {
+        println("Running tests with Allure agent: $agentJar")
+        println("Allure results directory: ${project.buildDir}/allure-results")
+    }
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -94,16 +130,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
-    implementation("io.coil-kt:coil-compose:2.7.0")
     implementation(libs.compose.material.icons)
-    testImplementation(libs.junit)
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
@@ -122,6 +149,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     // Coil
+    implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("io.coil-kt.coil3:coil-compose:3.4.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.4.0")
 
@@ -129,4 +157,26 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
+
+    // Allure
+    testImplementation(platform("io.qameta.allure:allure-bom:2.25.0"))
+    testImplementation("io.qameta.allure:allure-junit4")
+    agent("org.aspectj:aspectjweaver:${aspectJVersion}")
+    testImplementation("io.qameta.allure:allure-junit4-aspect")
+
+//    testImplementation("org.junit.platform:junit-platform-launcher:1.11.4")
+//    testImplementation("org.junit.platform:junit-platform-engine:1.11.4")
+
+    testImplementation(libs.junit)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
 }

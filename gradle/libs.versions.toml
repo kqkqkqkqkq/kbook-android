@@ -15,7 +15,8 @@ protobufPlugin = "0.9.6"
 grpcJava = "1.58.0"
 grpcKotlin = "1.58.0"
 
-ksp = "2.1.21-2.0.2"
+#ksp = "2.1.21-2.0.2"
+ksp = "2.2.0-2.0.2"
 hilt = "2.56.2"
 
 [libraries]

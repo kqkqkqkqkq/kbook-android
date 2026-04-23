@@ -5,4 +5,5 @@ plugins {
     alias(libs.plugins.protobuf) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.hilt) apply false
+    id("org.jetbrains.kotlinx.kover") version "0.9.8" apply false
 }
