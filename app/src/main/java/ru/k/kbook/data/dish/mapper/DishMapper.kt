@@ -18,20 +18,20 @@ import ru.k.kbook.api.grpc.schema.DishProduct
 import ru.k.kbook_api.grpc.dish.CreateDishRequest
 import ru.k.kbook_api.grpc.dish.DeleteDishRequest
 import ru.k.kbook_api.grpc.dish.DeleteDishResponse
-import ru.k.kbook_api.grpc.dish.Dish as GrpcDish
-import ru.k.kbook_api.grpc.dish.DishCategory as GrpcDishCategory
 import ru.k.kbook_api.grpc.dish.DishComposition
-import ru.k.kbook_api.grpc.dish.DishFlag as GrpcDishFlag
 import ru.k.kbook_api.grpc.dish.DishFlags
-import ru.k.kbook_api.grpc.dish.DishImage as GrpcDishImage
 import ru.k.kbook_api.grpc.dish.DishImages
 import ru.k.kbook_api.grpc.dish.DishListResponse
-import ru.k.kbook_api.grpc.dish.DishProduct as GrpcDishProduct
 import ru.k.kbook_api.grpc.dish.GetDishRequest
 import ru.k.kbook_api.grpc.dish.ListDishesRequest
 import ru.k.kbook_api.grpc.dish.UpdateDishRequest
 import ru.k.kbook_api.grpc.dish.ValidateDishResponse
 import java.time.Instant
+import ru.k.kbook_api.grpc.dish.Dish as GrpcDish
+import ru.k.kbook_api.grpc.dish.DishCategory as GrpcDishCategory
+import ru.k.kbook_api.grpc.dish.DishFlag as GrpcDishFlag
+import ru.k.kbook_api.grpc.dish.DishImage as GrpcDishImage
+import ru.k.kbook_api.grpc.dish.DishProduct as GrpcDishProduct
 
 fun CreateDishRequestDto.toGrpc(): CreateDishRequest {
     val builder = CreateDishRequest.newBuilder()
@@ -51,11 +51,14 @@ fun CreateDishRequestDto.toGrpc(): CreateDishRequest {
 fun UpdateDishRequestDto.toGrpc(): UpdateDishRequest {
     val builder = UpdateDishRequest.newBuilder().setId(id)
     if (name != null) builder.name = name
-    if (images != null) builder.images = DishImages.newBuilder().addAllItems(images.map { image -> image.toGrpc() }).build()
-    if (composition != null) builder.composition = DishComposition.newBuilder().addAllItems(composition.map { item -> item.toGrpc() }).build()
+    if (images != null) builder.images =
+        DishImages.newBuilder().addAllItems(images.map { image -> image.toGrpc() }).build()
+    if (composition != null) builder.composition =
+        DishComposition.newBuilder().addAllItems(composition.map { item -> item.toGrpc() }).build()
     if (portionSize != null) builder.portionSize = portionSize
     if (category != null) builder.category = category.toGrpc()
-    if (flags != null) builder.flags = DishFlags.newBuilder().addAllItems(flags.map { flag -> flag.toGrpc() }).build()
+    if (flags != null) builder.flags =
+        DishFlags.newBuilder().addAllItems(flags.map { flag -> flag.toGrpc() }).build()
     if (caloricity != null) builder.caloricity = caloricity
     if (protein != null) builder.protein = protein
     if (fat != null) builder.fat = fat
@@ -64,7 +67,8 @@ fun UpdateDishRequestDto.toGrpc(): UpdateDishRequest {
 }
 
 fun GetDishRequestDto.toGrpc(): GetDishRequest = GetDishRequest.newBuilder().setId(id).build()
-fun DeleteDishRequestDto.toGrpc(): DeleteDishRequest = DeleteDishRequest.newBuilder().setId(id).build()
+fun DeleteDishRequestDto.toGrpc(): DeleteDishRequest =
+    DeleteDishRequest.newBuilder().setId(id).build()
 
 fun ListDishesRequestDto.toGrpc(): ListDishesRequest =
     ListDishesRequest.newBuilder()

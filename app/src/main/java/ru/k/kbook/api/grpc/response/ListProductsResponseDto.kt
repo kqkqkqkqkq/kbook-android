@@ -6,5 +6,5 @@ data class ListProductsResponseDto(
     val products: List<Product>,
     val totalCount: Long,
     val success: Boolean,
-    val message: String
+    val message: String,
 )

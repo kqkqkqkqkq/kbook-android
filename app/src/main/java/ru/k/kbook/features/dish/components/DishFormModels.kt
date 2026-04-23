@@ -77,7 +77,10 @@ fun calculateAutoNutrition(
     return Quadruple(kcal, protein, fat, carb)
 }
 
-fun computeAvailableFlags(composition: List<DishCompositionInput>, productsById: Map<Long, Product>): Set<DishFlag> {
+fun computeAvailableFlags(
+    composition: List<DishCompositionInput>,
+    productsById: Map<Long, Product>,
+): Set<DishFlag> {
     if (composition.isEmpty()) return emptySet()
     val products = composition.mapNotNull { productsById[it.productId] }
     if (products.size != composition.size) return emptySet()

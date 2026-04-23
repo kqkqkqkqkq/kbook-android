@@ -18,7 +18,6 @@ import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.SortDirection
 import ru.k.kbook.api.grpc.schema.SortField
-import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.product.ProductRepository
 import javax.inject.Inject
 

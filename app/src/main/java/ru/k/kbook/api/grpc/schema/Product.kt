@@ -15,5 +15,5 @@ data class Product(
     val cookingRequired: CookingRequired,
     val flags: List<ProductFlag>,
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
 )

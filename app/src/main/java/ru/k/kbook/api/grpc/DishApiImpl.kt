@@ -16,10 +16,9 @@ import ru.k.kbook.data.dish.mapper.toKotlin
 import ru.k.kbook.data.dish.mapper.toResponse
 import ru.k.kbook_api.grpc.dish.DishServiceGrpcKt
 import javax.inject.Singleton
-import kotlin.getValue
 
 @Singleton
-class DishApiImpl @Inject constructor (
+class DishApiImpl @Inject constructor(
     private val channel: GrpcChannel,
 ) : DishApi {
     private val stub by lazy { DishServiceGrpcKt.DishServiceCoroutineStub(channel.channel) }

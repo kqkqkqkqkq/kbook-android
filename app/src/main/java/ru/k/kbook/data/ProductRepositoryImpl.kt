@@ -2,7 +2,6 @@ package ru.k.kbook.data
 
 import android.util.Log
 import ru.k.kbook.api.grpc.ProductApi
-import ru.k.kbook.api.grpc.ProductApiImpl
 import ru.k.kbook.api.grpc.request.CreateProductRequestDto
 import ru.k.kbook.api.grpc.request.DeleteProductRequestDto
 import ru.k.kbook.api.grpc.request.GetProductRequestDto
@@ -17,7 +16,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ProductRepositoryImpl @Inject constructor (
+class ProductRepositoryImpl @Inject constructor(
     private val productApi: ProductApi,
 ) : ProductRepository {
     override suspend fun createProduct(product: CreateProductRequestDto): ProductResponseDto {

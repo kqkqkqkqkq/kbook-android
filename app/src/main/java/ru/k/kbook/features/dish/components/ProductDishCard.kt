@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +36,7 @@ fun ProductDishCard(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick),
     ) {
         val image = product.images.firstOrNull()
         AsyncImage(
@@ -48,7 +47,7 @@ fun ProductDishCard(
                 .clip(MaterialTheme.shapes.small),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(R.drawable.ic_launcher_background),
-            error = painterResource(R.drawable.ic_launcher_background)
+            error = painterResource(R.drawable.ic_launcher_background),
         )
         Column {
             Text(

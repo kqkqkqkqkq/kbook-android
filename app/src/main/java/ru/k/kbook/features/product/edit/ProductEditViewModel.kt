@@ -1,8 +1,8 @@
 package ru.k.kbook.features.product.edit
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -13,11 +13,11 @@ import ru.k.kbook.api.grpc.schema.ImageInput
 import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
-import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.product.ProductRepository
 import javax.inject.Inject
 
 // TODO("нельзя удалить картинку из продукта при редактировании, одна остается обязательно")
+@HiltViewModel
 class ProductEditViewModel @Inject constructor(
     private val repository: ProductRepository,
 ) : ViewModel() {
@@ -95,7 +95,7 @@ class ProductEditViewModel @Inject constructor(
                                 id = it.id,
                                 url = it.url?.takeIf(String::isNotBlank),
                                 image = it.image,
-                                contentType = it.contentType
+                                contentType = it.contentType,
                             )
                         },
                         caloricity = current.caloricity.toDoubleOrNull(),
@@ -116,7 +116,12 @@ class ProductEditViewModel @Inject constructor(
                     println(response.message)
                 }
             }.onFailure { err ->
-                update { it.copy(isSaving = false, error = err.message ?: "Failed to update product") }
+                update {
+                    it.copy(
+                        isSaving = false,
+                        error = err.message ?: "Failed to update product",
+                    )
+                }
                 err.printStackTrace()
             }
         }

@@ -2,7 +2,6 @@ package ru.k.kbook.features.dish.details
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.grpc.StatusException
@@ -14,22 +13,19 @@ import kotlinx.coroutines.launch
 import ru.k.kbook.api.grpc.request.GetDishRequestDto
 import ru.k.kbook.api.grpc.request.GetProductRequestDto
 import ru.k.kbook.api.grpc.schema.Dish
-import ru.k.kbook.data.DishRepositoryImpl
-import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.dish.DishRepository
 import ru.k.kbook.domain.product.ProductRepository
 import ru.k.kbook.features.dish.components.ProductWithQuantity
 import javax.inject.Inject
-import kotlin.code
 
 sealed class DishDetailsUiState {
     data object Loading : DishDetailsUiState()
     data class Error(val message: String) : DishDetailsUiState()
-    data class Data(val dish: Dish,val products: List<ProductWithQuantity>) : DishDetailsUiState()
+    data class Data(val dish: Dish, val products: List<ProductWithQuantity>) : DishDetailsUiState()
 }
 
 @HiltViewModel
-class DishDetailsViewModel @Inject constructor (
+class DishDetailsViewModel @Inject constructor(
     private val dishRepo: DishRepository,
     private val productRepo: ProductRepository,
 ) : ViewModel() {
@@ -52,10 +48,11 @@ class DishDetailsViewModel @Inject constructor (
                     val productWithQuantityList = mutableListOf<ProductWithQuantity>()
                     for (comp in dish.composition) {
                         try {
-                            val productResponse = productRepo.getProduct(GetProductRequestDto(comp.productId))
+                            val productResponse =
+                                productRepo.getProduct(GetProductRequestDto(comp.productId))
                             if (productResponse.product != null) {
                                 productWithQuantityList.add(
-                                    ProductWithQuantity(productResponse.product, comp.quantity)
+                                    ProductWithQuantity(productResponse.product, comp.quantity),
                                 )
                             }
                         } catch (e: Exception) {

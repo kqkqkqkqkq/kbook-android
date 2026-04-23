@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
@@ -29,15 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import ru.k.kbook.R
 import ru.k.kbook.features.dish.components.ProductDishCard
-import ru.k.kbook.features.product.components.ProductCard
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -127,7 +122,7 @@ fun DishDetailsScreen(
                         product = product.product,
                         quantity = product.quantity,
                         onClick = { onNavigateToProduct(product.product.id) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }

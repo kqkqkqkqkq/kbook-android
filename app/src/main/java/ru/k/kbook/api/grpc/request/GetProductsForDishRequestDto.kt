@@ -1,5 +1,5 @@
 package ru.k.kbook.api.grpc.request
 
 data class GetProductsForDishRequestDto(
-    val productIds: List<Long>
+    val productIds: List<Long>,
 )

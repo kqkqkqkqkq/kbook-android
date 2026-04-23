@@ -96,12 +96,15 @@ fun Navigation() {
             }
             composable<Screen.ProductDetails> { backStackEntry ->
                 val id = backStackEntry.toRoute<Screen.ProductDetails>().productId
-                ProductDetailScreen(id,
+                ProductDetailScreen(
+                    id,
                     {
                         navController.popBackStack()
-                    }, { pid ->
+                    },
+                    { pid ->
                         navController.navigate(Screen.ProductEdit(pid))
-                    })
+                    },
+                )
 
             }
             composable<Screen.DishDetail> { backStackEntry ->
@@ -110,7 +113,13 @@ fun Navigation() {
                     id = id,
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateToEdit = { dishId -> navController.navigate(Screen.DishEdit(dishId)) },
-                    onNavigateToProduct = { productId -> navController.navigate(Screen.ProductDetails(productId)) },
+                    onNavigateToProduct = { productId ->
+                        navController.navigate(
+                            Screen.ProductDetails(
+                                productId,
+                            ),
+                        )
+                    },
                 )
             }
             composable<Screen.ProductCreate> {

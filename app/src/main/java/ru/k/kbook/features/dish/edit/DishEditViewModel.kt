@@ -1,7 +1,6 @@
 package ru.k.kbook.features.dish.edit
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,8 +12,6 @@ import ru.k.kbook.api.grpc.request.UpdateDishRequestDto
 import ru.k.kbook.api.grpc.schema.DishCategory
 import ru.k.kbook.api.grpc.schema.DishFlag
 import ru.k.kbook.api.grpc.schema.DishImage
-import ru.k.kbook.data.DishRepositoryImpl
-import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.dish.DishRepository
 import ru.k.kbook.domain.product.ProductRepository
 import ru.k.kbook.features.dish.components.DishCompositionInput
@@ -28,7 +25,7 @@ import javax.inject.Inject
 import kotlin.math.round
 
 @HiltViewModel
-class DishEditViewModel @Inject constructor (
+class DishEditViewModel @Inject constructor(
     private val dishRepo: DishRepository,
     private val productRepo: ProductRepository,
 ) : ViewModel() {
@@ -44,7 +41,8 @@ class DishEditViewModel @Inject constructor (
                     runCatching { dishRepo.getDish(GetDishRequestDto(dishId)).dish }
                         .onSuccess { dish ->
                             if (dish == null) {
-                                _uiState.value = DishFormState(isLoading = false, error = "Блюдо не найдено")
+                                _uiState.value =
+                                    DishFormState(isLoading = false, error = "Блюдо не найдено")
                                 return@onSuccess
                             }
                             _uiState.value = DishFormState(
@@ -59,35 +57,96 @@ class DishEditViewModel @Inject constructor (
                                 protein = dish.protein.toString(),
                                 fat = dish.fat.toString(),
                                 carb = dish.carb.toString(),
-                                composition = dish.composition.map { DishCompositionInput(it.productId, it.productName, it.quantity.toString()) }
+                                composition = dish.composition.map {
+                                    DishCompositionInput(
+                                        it.productId,
+                                        it.productName,
+                                        it.quantity.toString(),
+                                    )
+                                },
                             )
                             recalculateDrafts()
                         }
-                        .onFailure { _uiState.value = DishFormState(isLoading = false, error = it.message ?: "Ошибка загрузки") }
+                        .onFailure {
+                            _uiState.value = DishFormState(
+                                isLoading = false,
+                                error = it.message ?: "Ошибка загрузки",
+                            )
+                        }
                 }
-                .onFailure { _uiState.value = DishFormState(isLoading = false, error = it.message ?: "Ошибка загрузки") }
+                .onFailure {
+                    _uiState.value =
+                        DishFormState(isLoading = false, error = it.message ?: "Ошибка загрузки")
+                }
         }
     }
 
-    fun updateName(value: String) { val (name, macro) = parseCategoryMacro(value); _uiState.value = _uiState.value.copy(name = name, category = _uiState.value.category ?: macro) }
-    fun updateCategory(category: DishCategory?) { _uiState.value = _uiState.value.copy(category = category) }
-    fun updatePortionSize(value: String) { _uiState.value = _uiState.value.copy(portionSize = value); recalculateDrafts() }
-    fun updateCaloricity(value: String) { nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(caloricity = value) }
-    fun updateProtein(value: String) { nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(protein = value) }
-    fun updateFat(value: String) { nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(fat = value) }
-    fun updateCarb(value: String) { nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(carb = value) }
-    fun updateSelectedProduct(productId: Long?) { _uiState.value = _uiState.value.copy(selectedProductId = productId) }
-    fun updateSelectedQuantity(value: String) { _uiState.value = _uiState.value.copy(selectedQuantity = value) }
-    fun addImage(image: DishImage) { _uiState.value = _uiState.value.copy(images = _uiState.value.images + image) }
-    fun removeImage(image: DishImage) { _uiState.value = _uiState.value.copy(images = _uiState.value.images - image) }
-    fun clearError() { _uiState.value = _uiState.value.copy(error = null) }
-    fun toggleFlag(flag: DishFlag) { if (flag !in _uiState.value.availableFlags) return; _uiState.value = _uiState.value.copy(flags = _uiState.value.flags.toggle(flag)) }
+    fun updateName(value: String) {
+        val (name, macro) = parseCategoryMacro(value); _uiState.value =
+            _uiState.value.copy(name = name, category = _uiState.value.category ?: macro)
+    }
+
+    fun updateCategory(category: DishCategory?) {
+        _uiState.value = _uiState.value.copy(category = category)
+    }
+
+    fun updatePortionSize(value: String) {
+        _uiState.value = _uiState.value.copy(portionSize = value); recalculateDrafts()
+    }
+
+    fun updateCaloricity(value: String) {
+        nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(caloricity = value)
+    }
+
+    fun updateProtein(value: String) {
+        nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(protein = value)
+    }
+
+    fun updateFat(value: String) {
+        nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(fat = value)
+    }
+
+    fun updateCarb(value: String) {
+        nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(carb = value)
+    }
+
+    fun updateSelectedProduct(productId: Long?) {
+        _uiState.value = _uiState.value.copy(selectedProductId = productId)
+    }
+
+    fun updateSelectedQuantity(value: String) {
+        _uiState.value = _uiState.value.copy(selectedQuantity = value)
+    }
+
+    fun addImage(image: DishImage) {
+        _uiState.value = _uiState.value.copy(images = _uiState.value.images + image)
+    }
+
+    fun removeImage(image: DishImage) {
+        _uiState.value = _uiState.value.copy(images = _uiState.value.images - image)
+    }
+
+    fun clearError() {
+        _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun toggleFlag(flag: DishFlag) {
+        if (flag !in _uiState.value.availableFlags) return; _uiState.value =
+            _uiState.value.copy(flags = _uiState.value.flags.toggle(flag))
+    }
 
     fun addCompositionItem() {
         val s = _uiState.value
         val product = s.products.firstOrNull { it.id == s.selectedProductId } ?: return
         if (s.selectedQuantity.toDoubleOrNull() == null) return
-        _uiState.value = s.copy(composition = s.composition + DishCompositionInput(product.id, product.name, s.selectedQuantity), selectedProductId = null, selectedQuantity = "")
+        _uiState.value = s.copy(
+            composition = s.composition + DishCompositionInput(
+                product.id,
+                product.name,
+                s.selectedQuantity,
+            ),
+            selectedProductId = null, selectedQuantity = "",
+        )
         recalculateDrafts()
     }
 
@@ -123,8 +182,12 @@ class DishEditViewModel @Inject constructor (
         val f = s.fat.toDoubleOrNull()
         val c = s.carb.toDoubleOrNull()
         val kcal = s.caloricity.toDoubleOrNull()
-        if (s.name.isBlank() || portion == null || p == null || f == null || c == null || kcal == null) { _uiState.value = s.copy(error = "Заполните обязательные поля"); return }
-        if (bjuSumPer100(portion, p, f, c) > 100.0) { _uiState.value = s.copy(error = "Сумма БЖУ на 100 г не может быть больше 100"); return }
+        if (s.name.isBlank() || portion == null || p == null || f == null || c == null || kcal == null) {
+            _uiState.value = s.copy(error = "Заполните обязательные поля"); return
+        }
+        if (bjuSumPer100(portion, p, f, c) > 100.0) {
+            _uiState.value = s.copy(error = "Сумма БЖУ на 100 г не может быть больше 100"); return
+        }
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true)
             runCatching {
@@ -141,13 +204,20 @@ class DishEditViewModel @Inject constructor (
                         protein = p,
                         fat = f,
                         carb = c,
-                    )
+                    ),
                 )
             }.onSuccess { _uiState.value = _uiState.value.copy(isSaving = false); onSuccess() }
-                .onFailure { _uiState.value = _uiState.value.copy(isSaving = false, error = it.message ?: "Ошибка сохранения") }
+                .onFailure {
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        error = it.message ?: "Ошибка сохранения",
+                    )
+                }
         }
     }
 }
 
-private fun Set<DishFlag>.toggle(flag: DishFlag): Set<DishFlag> = if (flag in this) this - flag else this + flag
-private fun Double.round1(): String = (round(this * 10.0) / 10.0).toString()
+private fun Set<DishFlag>.toggle(flag: DishFlag): Set<DishFlag> =
+    if (flag in this) this - flag else this + flag
+
+fun Double.round1(): String = (round(this * 10.0) / 10.0).toString()

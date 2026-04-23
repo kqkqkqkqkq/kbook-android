@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,8 +15,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,7 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import ru.k.kbook.R
 import ru.k.kbook.api.grpc.schema.ContentType
@@ -70,7 +66,7 @@ fun ProductDetailScreen(
             Spacer(modifier = Modifier.height(8.dp))
             CircularProgressIndicator()
         }
-        
+
         is ProductDetailUiState.Error -> Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
@@ -78,7 +74,11 @@ fun ProductDetailScreen(
             Text(state.message)
         }
 
-        is ProductDetailUiState.Data -> ProductDetailScreenContent(state.product, onNavigateBack, onNavigateToEdit)
+        is ProductDetailUiState.Data -> ProductDetailScreenContent(
+            state.product,
+            onNavigateBack,
+            onNavigateToEdit,
+        )
     }
 }
 
@@ -93,7 +93,12 @@ fun ProductDetailScreenContent(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(product.name, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        product.name,
+                        style = MaterialTheme.typography.headlineSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
@@ -104,7 +109,7 @@ fun ProductDetailScreenContent(
                     IconButton(onClick = { onNavigateToEdit(product.id) }) {
                         Icon(Icons.Default.Edit, null)
                     }
-                }
+                },
             )
         },
     ) { padding ->
@@ -126,7 +131,7 @@ fun ProductDetailScreenContent(
                             .clip(MaterialTheme.shapes.small),
                         contentScale = ContentScale.Crop,
                         placeholder = painterResource(R.drawable.ic_launcher_background),
-                        error = painterResource(R.drawable.ic_launcher_background)
+                        error = painterResource(R.drawable.ic_launcher_background),
                     )
                 }
             }
@@ -154,6 +159,6 @@ private fun ContentPreview() {
             emptyList(), Instant.now(),
             Instant.now(),
         ),
-        {}, {}
+        {}, {},
     )
 }

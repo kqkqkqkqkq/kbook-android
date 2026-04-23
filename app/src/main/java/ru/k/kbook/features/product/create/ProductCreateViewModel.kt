@@ -8,20 +8,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import ru.k.kbook.api.grpc.request.CreateProductRequestDto
-import ru.k.kbook.api.grpc.schema.ContentType
 import ru.k.kbook.api.grpc.schema.CookingRequired
 import ru.k.kbook.api.grpc.schema.ImageInput
-import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
-import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.product.ProductRepository
 import javax.inject.Inject
-import kotlin.text.isNotBlank
 
 @HiltViewModel
-class ProductCreateViewModel @Inject constructor (
+class ProductCreateViewModel @Inject constructor(
     private val repository: ProductRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProductCreateUiState())
@@ -108,7 +104,8 @@ class ProductCreateViewModel @Inject constructor (
                     onSuccess()
                     Log.e("PRODUCT_CREATE", "success")
                 } else {
-                    _uiState.value = _uiState.value.copy(error = response.message, isLoading = false)
+                    _uiState.value =
+                        _uiState.value.copy(error = response.message, isLoading = false)
                     Log.e("PRODUCT_CREATE", response.message)
                 }
             } catch (e: Exception) {

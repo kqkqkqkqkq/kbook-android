@@ -4,5 +4,5 @@ data class ProductImage(
     val id: Long,
     val url: String?,
     val image: ByteArray?,
-    val contentType: ContentType
+    val contentType: ContentType,
 )

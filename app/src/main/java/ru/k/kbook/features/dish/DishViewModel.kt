@@ -15,7 +15,6 @@ import ru.k.kbook.api.grpc.request.ListDishesRequestDto
 import ru.k.kbook.api.grpc.schema.Dish
 import ru.k.kbook.api.grpc.schema.DishCategory
 import ru.k.kbook.api.grpc.schema.DishFlag
-import ru.k.kbook.data.DishRepositoryImpl
 import ru.k.kbook.domain.dish.DishRepository
 import javax.inject.Inject
 
@@ -38,7 +37,7 @@ sealed class DishEvent {
 }
 
 @HiltViewModel
-class DishViewModel @Inject constructor (
+class DishViewModel @Inject constructor(
     private val repo: DishRepository,
 ) : ViewModel() {
     private var state = DishListState()
@@ -54,7 +53,8 @@ class DishViewModel @Inject constructor (
     }
 
     fun onCategory(value: DishCategory) {
-        val items = if (value in state.categories) state.categories - value else state.categories + value
+        val items =
+            if (value in state.categories) state.categories - value else state.categories + value
         state = state.copy(categories = items)
         load()
     }

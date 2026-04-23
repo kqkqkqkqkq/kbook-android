@@ -1,6 +1,5 @@
 package ru.k.kbook.features.product.list
 
-import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -20,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,11 +39,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.k.kbook.api.grpc.schema.CookingRequired
 import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.api.grpc.schema.ProductCategory
@@ -111,7 +107,7 @@ fun ProductScreenContent(
 
     val rotation by animateFloatAsState(
         targetValue = if (state.sortDirection == SortDirection.DESC) 0f else 180f,
-        animationSpec = tween(300)
+        animationSpec = tween(300),
     )
 
     Scaffold(
@@ -236,7 +232,9 @@ fun ProductScreenContent(
                         Icon(
                             Icons.Default.ArrowDropDown,
                             null,
-                            modifier = Modifier.rotate(rotation).size(48.dp),
+                            modifier = Modifier
+                                .rotate(rotation)
+                                .size(48.dp),
                         )
                     }
                 }

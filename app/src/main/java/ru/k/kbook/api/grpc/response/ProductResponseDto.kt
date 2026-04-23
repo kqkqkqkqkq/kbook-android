@@ -5,5 +5,5 @@ import ru.k.kbook.api.grpc.schema.Product
 data class ProductResponseDto(
     val product: Product?,
     val success: Boolean,
-    val message: String
+    val message: String,
 )

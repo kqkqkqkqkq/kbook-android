@@ -45,19 +45,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import ru.k.kbook.features.product.contextUriToProductImage
-import ru.k.kbook.features.product.ProductImagePreview
 import ru.k.kbook.api.grpc.schema.ContentType
 import ru.k.kbook.api.grpc.schema.CookingRequired
 import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
+import ru.k.kbook.features.product.ProductImagePreview
+import ru.k.kbook.features.product.contextUriToProductImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,13 +68,14 @@ fun ProductCreateScreen(
     val context = LocalContext.current
 
     var newImageUrl by remember { mutableStateOf("") }
-    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri ?: return@rememberLauncherForActivityResult
-        val image = contextUriToProductImage(context, uri)
-        if (image != null) {
-            vm.addImageUrl(image)
+    val galleryLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri ?: return@rememberLauncherForActivityResult
+            val image = contextUriToProductImage(context, uri)
+            if (image != null) {
+                vm.addImageUrl(image)
+            }
         }
-    }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -92,7 +92,7 @@ fun ProductCreateScreen(
                 },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
 
         Column(
@@ -151,7 +151,10 @@ fun ProductCreateScreen(
             )
 
             var expanded by remember { mutableStateOf(false) }
-            ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+            ) {
                 OutlinedTextField(
                     readOnly = true,
                     value = state.category.name,

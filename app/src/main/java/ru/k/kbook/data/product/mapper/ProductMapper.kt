@@ -2,10 +2,39 @@ package ru.k.kbook.data.product.mapper
 
 import com.google.protobuf.ByteString
 import com.google.protobuf.kotlin.toByteString
-import ru.k.kbook.api.grpc.request.*
-import ru.k.kbook.api.grpc.response.*
-import ru.k.kbook.api.grpc.schema.*
-import ru.k.kbook_api.grpc.product.*
+import ru.k.kbook.api.grpc.request.CreateProductRequestDto
+import ru.k.kbook.api.grpc.request.DeleteProductRequestDto
+import ru.k.kbook.api.grpc.request.GetProductRequestDto
+import ru.k.kbook.api.grpc.request.GetProductsForDishRequestDto
+import ru.k.kbook.api.grpc.request.ListProductsRequestDto
+import ru.k.kbook.api.grpc.request.UpdateProductRequestDto
+import ru.k.kbook.api.grpc.response.DeleteProductResponseDto
+import ru.k.kbook.api.grpc.response.ListProductsResponseDto
+import ru.k.kbook.api.grpc.response.ProductResponseDto
+import ru.k.kbook.api.grpc.schema.ContentType
+import ru.k.kbook.api.grpc.schema.CookingRequired
+import ru.k.kbook.api.grpc.schema.Product
+import ru.k.kbook.api.grpc.schema.ProductCategory
+import ru.k.kbook.api.grpc.schema.ProductFlag
+import ru.k.kbook.api.grpc.schema.ProductImage
+import ru.k.kbook.api.grpc.schema.SortDirection
+import ru.k.kbook.api.grpc.schema.SortField
+import ru.k.kbook_api.grpc.product.ContentTypeDto
+import ru.k.kbook_api.grpc.product.CookingRequiredDto
+import ru.k.kbook_api.grpc.product.CreateProductRequest
+import ru.k.kbook_api.grpc.product.DeleteProductRequest
+import ru.k.kbook_api.grpc.product.DeleteProductResponse
+import ru.k.kbook_api.grpc.product.GetProductRequest
+import ru.k.kbook_api.grpc.product.GetProductsForDishRequest
+import ru.k.kbook_api.grpc.product.ListProductsRequest
+import ru.k.kbook_api.grpc.product.ListProductsResponse
+import ru.k.kbook_api.grpc.product.ProductCategoryDto
+import ru.k.kbook_api.grpc.product.ProductDto
+import ru.k.kbook_api.grpc.product.ProductFlagDto
+import ru.k.kbook_api.grpc.product.ProductResponse
+import ru.k.kbook_api.grpc.product.SortDirectionDto
+import ru.k.kbook_api.grpc.product.SortFieldDto
+import ru.k.kbook_api.grpc.product.UpdateProductRequest
 import java.time.Instant
 
 fun CreateProductRequestDto.toGrpc(): CreateProductRequest {
@@ -15,7 +44,7 @@ fun CreateProductRequestDto.toGrpc(): CreateProductRequest {
             images.map { img ->
                 ru.k.kbook_api.grpc.product.ImageInput.newBuilder()
                     .setUrl(img.url ?: "")
-                    .setImage(img.image?.toByteString() ?: com.google.protobuf.ByteString.EMPTY)
+                    .setImage(img.image?.toByteString() ?: ByteString.EMPTY)
                     .setContentType(img.contentType.toGrpc())
                     .build()
             },
@@ -49,13 +78,15 @@ fun UpdateProductRequestDto.toGrpc(): UpdateProductRequest {
     cookingRequired?.let { builder.setCookingRequired(it.toGrpc()) }
 
     images?.let { imgs ->
-        builder.addAllImages(imgs.map { img ->
-            ru.k.kbook_api.grpc.product.ImageInput.newBuilder()
-                .setUrl(img.url ?: "")
-                .setImage(img.image?.toByteString() ?: ByteString.EMPTY)
-                .setContentType(img.contentType.toGrpc())
-                .build()
-        })
+        builder.addAllImages(
+            imgs.map { img ->
+                ru.k.kbook_api.grpc.product.ImageInput.newBuilder()
+                    .setUrl(img.url ?: "")
+                    .setImage(img.image?.toByteString() ?: ByteString.EMPTY)
+                    .setContentType(img.contentType.toGrpc())
+                    .build()
+            },
+        )
     }
 
     flags?.let { flags ->

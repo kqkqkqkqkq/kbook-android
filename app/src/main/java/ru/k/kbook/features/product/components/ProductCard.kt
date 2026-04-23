@@ -1,23 +1,18 @@
 package ru.k.kbook.features.product.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -51,7 +46,7 @@ fun ProductCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -67,14 +62,29 @@ fun ProductCard(
                     .clip(MaterialTheme.shapes.small),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(R.drawable.ic_launcher_background),
-                error = painterResource(R.drawable.ic_launcher_background)
+                error = painterResource(R.drawable.ic_launcher_background),
             )
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(product.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text("${product.caloricity} kcal/100g", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    product.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    "${product.caloricity} kcal/100g",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 Text(product.category.name, style = MaterialTheme.typography.labelMedium)
             }
-            IconButton(onClick = onDelete, shape = MaterialTheme.shapes.small) { Icon(Icons.Filled.Delete, contentDescription = null) }
+            IconButton(
+                onClick = onDelete,
+                shape = MaterialTheme.shapes.small,
+            ) { Icon(Icons.Filled.Delete, contentDescription = null) }
         }
     }
 }
@@ -90,6 +100,9 @@ private fun ProductPreview() {
             "Description",
             ProductCategory.MEAT, CookingRequired.REQUIRES_COOKING,
             emptyList(), Instant.now(),
-            Instant.now()), {} ,{})
+            Instant.now(),
+        ),
+        {}, {},
+    )
 }
 

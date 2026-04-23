@@ -15,8 +15,10 @@ fun ProductImagePreview(
         image.contentType == ContentType.URL && !image.url.isNullOrBlank() -> {
             coil3.compose.AsyncImage(model = image.url, contentDescription = null)
         }
+
         image.contentType == ContentType.IMAGE && image.image != null -> {
-            val bitmap = BitmapFactory.decodeByteArray(image.image, 0, image.image.size)?.asImageBitmap()
+            val bitmap =
+                BitmapFactory.decodeByteArray(image.image, 0, image.image.size)?.asImageBitmap()
             if (bitmap != null) {
                 Image(bitmap = bitmap, contentDescription = null)
             }

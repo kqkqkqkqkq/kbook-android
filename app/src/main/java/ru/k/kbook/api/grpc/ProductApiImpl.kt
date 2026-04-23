@@ -12,12 +12,12 @@ import ru.k.kbook.api.grpc.response.ProductResponseDto
 import ru.k.kbook.config.GrpcChannel
 import ru.k.kbook.data.product.mapper.toGrpc
 import ru.k.kbook.data.product.mapper.toKotlin
-import ru.k.kbook_api.grpc.product.*
+import ru.k.kbook_api.grpc.product.ProductServiceGrpcKt
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ProductApiImpl @Inject constructor (
+class ProductApiImpl @Inject constructor(
     private val channel: GrpcChannel,
 ) : ProductApi {
     private val stub by lazy {

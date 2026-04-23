@@ -28,7 +28,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.k.kbook.api.grpc.schema.Dish
 import ru.k.kbook.api.grpc.schema.DishCategory
 import ru.k.kbook.api.grpc.schema.DishFlag
@@ -45,7 +44,8 @@ fun DishScreen(
     LaunchedEffect(Unit) {
         vm.events.collect { event ->
             when (event) {
-                is DishEvent.Message -> Toast.makeText(context, event.text, Toast.LENGTH_SHORT).show()
+                is DishEvent.Message -> Toast.makeText(context, event.text, Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -53,8 +53,16 @@ fun DishScreen(
         vm.load()
     }
     when (val state = vm.uiState.collectAsStateWithLifecycle().value) {
-        DishListUiState.Loading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Loading") }
-        is DishListUiState.Error -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(state.message) }
+        DishListUiState.Loading -> Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) { Text("Loading") }
+
+        is DishListUiState.Error -> Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) { Text(state.message) }
+
         is DishListUiState.Data -> DishListContent(state.value, onDetail, onCreate, vm)
     }
 }
@@ -86,32 +94,45 @@ private fun DishListContent(
                 .fillMaxSize()
                 .padding(
                     top = padding.calculateTopPadding(),
-                    bottom = padding.calculateBottomPadding()
+                    bottom = padding.calculateBottomPadding(),
                 )
                 .padding(horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {
-                item {
-                    OutlinedTextField(value = state.search, onValueChange = vm::onSearch, modifier = Modifier.fillMaxWidth(), label = { Text("Search") })
-                }
-                item {
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(DishCategory.entries) { item ->
-                            FilterChip(selected = item in state.categories, onClick = { vm.onCategory(item) }, label = { Text(item.name) })
-                        }
+            item {
+                OutlinedTextField(
+                    value = state.search,
+                    onValueChange = vm::onSearch,
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Search") },
+                )
+            }
+            item {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(DishCategory.entries) { item ->
+                        FilterChip(
+                            selected = item in state.categories,
+                            onClick = { vm.onCategory(item) },
+                            label = { Text(item.name) },
+                        )
                     }
-                }
-                item {
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(DishFlag.entries) { item ->
-                            FilterChip(selected = item in state.flags, onClick = { vm.onFlag(item) }, label = { Text(item.name) })
-                        }
-                    }
-                }
-                items(state.dishes) { dish ->
-                    DishCard(dish = dish, onClick = onDetail, onDelete = { vm.delete(it.id) })
                 }
             }
+            item {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(DishFlag.entries) { item ->
+                        FilterChip(
+                            selected = item in state.flags,
+                            onClick = { vm.onFlag(item) },
+                            label = { Text(item.name) },
+                        )
+                    }
+                }
+            }
+            items(state.dishes) { dish ->
+                DishCard(dish = dish, onClick = onDetail, onDelete = { vm.delete(it.id) })
+            }
+        }
     }
 }

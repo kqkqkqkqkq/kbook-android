@@ -2,6 +2,7 @@ package ru.k.kbook.features.dish.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -10,8 +11,6 @@ import ru.k.kbook.api.grpc.request.ListProductsRequestDto
 import ru.k.kbook.api.grpc.schema.DishCategory
 import ru.k.kbook.api.grpc.schema.DishFlag
 import ru.k.kbook.api.grpc.schema.DishImage
-import ru.k.kbook.data.DishRepositoryImpl
-import ru.k.kbook.data.ProductRepositoryImpl
 import ru.k.kbook.domain.dish.DishRepository
 import ru.k.kbook.domain.product.ProductRepository
 import ru.k.kbook.features.dish.components.DishCompositionInput
@@ -24,7 +23,8 @@ import ru.k.kbook.features.dish.components.toDishProducts
 import javax.inject.Inject
 import kotlin.math.round
 
-class DishCreateViewModel @Inject constructor (
+@HiltViewModel
+class DishCreateViewModel @Inject constructor(
     private val dishRepo: DishRepository,
     private val productRepo: ProductRepository,
 ) : ViewModel() {
@@ -38,20 +38,55 @@ class DishCreateViewModel @Inject constructor (
 
     fun updateName(value: String) {
         val (cleanName, macroCategory) = parseCategoryMacro(value)
-        _uiState.value = _uiState.value.copy(name = cleanName, category = _uiState.value.category ?: macroCategory)
+        _uiState.value = _uiState.value.copy(
+            name = cleanName,
+            category = _uiState.value.category ?: macroCategory,
+        )
     }
 
-    fun updateCategory(category: DishCategory?) { _uiState.value = _uiState.value.copy(category = category) }
-    fun updatePortionSize(value: String) { _uiState.value = _uiState.value.copy(portionSize = value); recalculateDrafts() }
-    fun updateCaloricity(value: String) { nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(caloricity = value) }
-    fun updateProtein(value: String) { nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(protein = value) }
-    fun updateFat(value: String) { nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(fat = value) }
-    fun updateCarb(value: String) { nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(carb = value) }
-    fun updateSelectedProduct(productId: Long?) { _uiState.value = _uiState.value.copy(selectedProductId = productId) }
-    fun updateSelectedQuantity(value: String) { _uiState.value = _uiState.value.copy(selectedQuantity = value) }
-    fun addImage(image: DishImage) { _uiState.value = _uiState.value.copy(images = _uiState.value.images + image) }
-    fun removeImage(image: DishImage) { _uiState.value = _uiState.value.copy(images = _uiState.value.images - image) }
-    fun clearError() { _uiState.value = _uiState.value.copy(error = null) }
+    fun updateCategory(category: DishCategory?) {
+        _uiState.value = _uiState.value.copy(category = category)
+    }
+
+    fun updatePortionSize(value: String) {
+        _uiState.value = _uiState.value.copy(portionSize = value); recalculateDrafts()
+    }
+
+    fun updateCaloricity(value: String) {
+        nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(caloricity = value)
+    }
+
+    fun updateProtein(value: String) {
+        nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(protein = value)
+    }
+
+    fun updateFat(value: String) {
+        nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(fat = value)
+    }
+
+    fun updateCarb(value: String) {
+        nutritionManuallyEdited = true; _uiState.value = _uiState.value.copy(carb = value)
+    }
+
+    fun updateSelectedProduct(productId: Long?) {
+        _uiState.value = _uiState.value.copy(selectedProductId = productId)
+    }
+
+    fun updateSelectedQuantity(value: String) {
+        _uiState.value = _uiState.value.copy(selectedQuantity = value)
+    }
+
+    fun addImage(image: DishImage) {
+        _uiState.value = _uiState.value.copy(images = _uiState.value.images + image)
+    }
+
+    fun removeImage(image: DishImage) {
+        _uiState.value = _uiState.value.copy(images = _uiState.value.images - image)
+    }
+
+    fun clearError() {
+        _uiState.value = _uiState.value.copy(error = null)
+    }
 
     fun toggleFlag(flag: DishFlag) {
         if (flag !in _uiState.value.availableFlags) return
@@ -65,7 +100,11 @@ class DishCreateViewModel @Inject constructor (
         val product = state.products.firstOrNull { it.id == state.selectedProductId } ?: return
         if (state.selectedQuantity.toDoubleOrNull() == null) return
         _uiState.value = state.copy(
-            composition = state.composition + DishCompositionInput(product.id, product.name, state.selectedQuantity),
+            composition = state.composition + DishCompositionInput(
+                product.id,
+                product.name,
+                state.selectedQuantity,
+            ),
             selectedProductId = null,
             selectedQuantity = "",
         )
@@ -75,15 +114,26 @@ class DishCreateViewModel @Inject constructor (
     fun removeCompositionItem(index: Int) {
         val state = _uiState.value
         if (index !in state.composition.indices) return
-        _uiState.value = state.copy(composition = state.composition.filterIndexed { i, _ -> i != index })
+        _uiState.value =
+            state.copy(composition = state.composition.filterIndexed { i, _ -> i != index })
         recalculateDrafts()
     }
 
     private fun loadProducts() {
         viewModelScope.launch {
             runCatching { productRepo.listProducts(ListProductsRequestDto()) }
-                .onSuccess { _uiState.value = _uiState.value.copy(isLoading = false, products = it.products); recalculateDrafts() }
-                .onFailure { _uiState.value = _uiState.value.copy(isLoading = false, error = it.message ?: "Не удалось загрузить продукты") }
+                .onSuccess {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        products = it.products,
+                    ); recalculateDrafts()
+                }
+                .onFailure {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = it.message ?: "Не удалось загрузить продукты",
+                    )
+                }
         }
     }
 
@@ -137,13 +187,14 @@ class DishCreateViewModel @Inject constructor (
                         protein = protein,
                         fat = fat,
                         carb = carb,
-                    )
+                    ),
                 )
             }.onSuccess {
                 _uiState.value = _uiState.value.copy(isSaving = false)
                 onSuccess()
             }.onFailure {
-                _uiState.value = _uiState.value.copy(isSaving = false, error = it.message ?: "Ошибка создания")
+                _uiState.value =
+                    _uiState.value.copy(isSaving = false, error = it.message ?: "Ошибка создания")
             }
         }
     }

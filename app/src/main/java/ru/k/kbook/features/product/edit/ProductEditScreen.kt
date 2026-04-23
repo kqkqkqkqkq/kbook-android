@@ -47,7 +47,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.k.kbook.api.grpc.schema.ContentType
 import ru.k.kbook.api.grpc.schema.CookingRequired
 import ru.k.kbook.api.grpc.schema.ProductCategory
@@ -72,10 +71,11 @@ fun ProductEditScreen(
         vm.loadProduct(id)
     }
 
-    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        uri ?: return@rememberLauncherForActivityResult
-        contextUriToProductImage(context, uri)?.let(vm::addImage)
-    }
+    val galleryLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            uri ?: return@rememberLauncherForActivityResult
+            contextUriToProductImage(context, uri)?.let(vm::addImage)
+        }
 
     Scaffold(
         topBar = {
@@ -96,7 +96,6 @@ fun ProductEditScreen(
             Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(modifier = Modifier.padding(16.dp))
             }
-            return@Scaffold
         }
 
         Column(
