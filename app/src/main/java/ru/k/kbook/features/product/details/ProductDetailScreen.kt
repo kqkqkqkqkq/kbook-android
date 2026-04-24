@@ -43,6 +43,7 @@ import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.api.grpc.schema.ProductImage
 import java.time.Instant
+import java.util.Collections.emptyList
 
 @Composable
 fun ProductDetailScreen(
@@ -62,7 +63,7 @@ fun ProductDetailScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("Loading...")
+            Text("Загрузка...")
             Spacer(modifier = Modifier.height(8.dp))
             CircularProgressIndicator()
         }
@@ -135,13 +136,15 @@ fun ProductDetailScreenContent(
                     )
                 }
             }
-            Text("kcal ${product.caloricity} | p ${product.protein} | f ${product.fat} | c ${product.carb}")
+            Text("каллорийность: ${product.caloricity} | белки ${product.protein} | жиры ${product.fat} | углеводы ${product.carb}")
             if (!product.description.isNullOrEmpty()) {
                 Text(product.description)
             }
-            Text("Category: ${product.category}")
-            Text("Cooking: ${product.cookingRequired}")
-            Text("Flags: ${product.flags.joinToString()}")
+            Text("Категория: ${product.category.getRu()}")
+            Text("Тип приготовления: ${product.cookingRequired.getRu()}")
+            Text("Флаги: ${product.flags.map{ it.getRu() }.joinToString()}")
+            Text("Дата создания: ${product.createdAt}")
+            Text("Дата редактирования: ${product.updatedAt}")
         }
     }
 }

@@ -56,7 +56,7 @@ fun DishScreen(
         DishListUiState.Loading -> Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
-        ) { Text("Loading") }
+        ) { Text("Загрузка") }
 
         is DishListUiState.Error -> Box(
             modifier = Modifier.fillMaxSize(),
@@ -79,7 +79,7 @@ private fun DishListContent(
         modifier = Modifier
             .padding(bottom = 80.dp)
             .fillMaxSize(),
-        topBar = { TopAppBar(title = { Text("Dishes") }) },
+        topBar = { TopAppBar(title = { Text("Блюда") }) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreate,
@@ -105,7 +105,7 @@ private fun DishListContent(
                     value = state.search,
                     onValueChange = vm::onSearch,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Search") },
+                    label = { Text("Поиск") },
                 )
             }
             item {
@@ -114,7 +114,7 @@ private fun DishListContent(
                         FilterChip(
                             selected = item in state.categories,
                             onClick = { vm.onCategory(item) },
-                            label = { Text(item.name) },
+                            label = { Text(item.getRu()) },
                         )
                     }
                 }
@@ -125,7 +125,7 @@ private fun DishListContent(
                         FilterChip(
                             selected = item in state.flags,
                             onClick = { vm.onFlag(item) },
-                            label = { Text(item.name) },
+                            label = { Text(item.getRu()) },
                         )
                     }
                 }

@@ -5,5 +5,14 @@ enum class SortField {
     CALORICITY,
     PROTEIN,
     FAT,
-    CARB
+    CARB,
+    ;
+
+    fun getRu() = when(this) {
+        SortField.NAME -> "Название"
+        SortField.CALORICITY -> "Калорийность"
+        SortField.PROTEIN -> "Белки"
+        SortField.FAT -> "Жиры"
+        SortField.CARB -> "Углеводы"
+    }
 }

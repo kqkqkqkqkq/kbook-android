@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.protobuf")
     alias(libs.plugins.kotlin.android)
-    kotlin("plugin.serialization") version "2.0.21"
+    kotlin("plugin.serialization") version "2.2.0"
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     id("org.jetbrains.kotlinx.kover") version "0.9.8"
@@ -107,17 +107,12 @@ tasks.withType<Test> {
     val agentJar = configurations.getByName("agent").asPath
 
     jvmArgs = listOf(
-        "-javaagent:${agentJar}",
+//        "-javaagent:${agentJar}",
         "-XX:+EnableDynamicAgentLoading",
         "-Djdk.instrument.traceUsage=false"
     )
 
     systemProperty("allure.results.directory", "${project.buildDir}/allure-results")
-
-    doFirst {
-        println("Running tests with Allure agent: $agentJar")
-        println("Allure results directory: ${project.buildDir}/allure-results")
-    }
 }
 
 dependencies {
@@ -129,12 +124,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.compose.material.icons)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+    implementation(libs.kotlinx.datetime)
 
     // gRPC
     implementation("io.grpc:grpc-protobuf:1.80.0")
@@ -146,29 +141,25 @@ dependencies {
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.9.7")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation(libs.kotlinx.serialization.json)
 
     // Coil
-    implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("io.coil-kt.coil3:coil-compose:3.4.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.4.0")
 
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // Allure
     testImplementation(platform("io.qameta.allure:allure-bom:2.25.0"))
     testImplementation("io.qameta.allure:allure-junit4")
-    agent("org.aspectj:aspectjweaver:${aspectJVersion}")
-    testImplementation("io.qameta.allure:allure-junit4-aspect")
-
-//    testImplementation("org.junit.platform:junit-platform-launcher:1.11.4")
-//    testImplementation("org.junit.platform:junit-platform-engine:1.11.4")
+//    agent("org.aspectj:aspectjweaver:${aspectJVersion}")
+//    testImplementation("io.qameta.allure:allure-junit4-aspect")
 
     testImplementation(libs.junit)
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    testImplementation(libs.kotlinx.coroutines.test)
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -179,4 +170,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
+    val kaspresso = "1.6.1"
+    androidTestImplementation("com.kaspersky.android-components:kaspresso:$kaspresso")
+    androidTestImplementation("com.kaspersky.android-components:kaspresso-allure-support:$kaspresso")
+    androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:$kaspresso")
 }

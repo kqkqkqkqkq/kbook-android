@@ -108,8 +108,10 @@ fun DishDetailsScreen(
                 item { Text("Калории: ${state.dish.caloricity}") }
                 item { Text("Б: ${state.dish.protein}, Ж: ${state.dish.fat}, У: ${state.dish.carb}") }
                 item { Text("Порция: ${state.dish.portionSize} г") }
-                item { Text("Категория: ${state.dish.category}") }
-                item { Text("Флаги: ${state.dish.flags.joinToString()}") }
+                item { Text("Категория: ${state.dish.category.getRu()}") }
+                item { Text("Флаги: ${state.dish.flags.map{ it.getRu() }.joinToString()}") }
+                item { Text("Дата создания: ${state.dish.createdAt}") }
+                item { Text("Последнее обновление: ${state.dish.updatedAt}") }
                 item { Text("Состав:") }
                 items(state.products) { product ->
 //                    Text(

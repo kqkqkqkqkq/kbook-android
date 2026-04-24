@@ -83,7 +83,7 @@ fun ProductCreateScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("New Product", style = MaterialTheme.typography.headlineSmall)
+                    Text("Новый продукт", style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
@@ -106,14 +106,14 @@ fun ProductCreateScreen(
             OutlinedTextField(
                 value = state.name,
                 onValueChange = { vm.updateName(it) },
-                label = { Text("Product Name") },
+                label = { Text("Название") },
                 modifier = Modifier.fillMaxWidth(),
             )
 
             OutlinedTextField(
                 value = state.caloricity,
                 onValueChange = { vm.updateCaloricity(it) },
-                label = { Text("Caloricity (kcal)") },
+                label = { Text("Калорийность") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -121,7 +121,7 @@ fun ProductCreateScreen(
             OutlinedTextField(
                 value = state.protein,
                 onValueChange = { vm.updateProtein(it) },
-                label = { Text("Protein (g)") },
+                label = { Text("Белки") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -129,7 +129,7 @@ fun ProductCreateScreen(
             OutlinedTextField(
                 value = state.fat,
                 onValueChange = { vm.updateFat(it) },
-                label = { Text("Fat (g)") },
+                label = { Text("Жиры") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -137,7 +137,7 @@ fun ProductCreateScreen(
             OutlinedTextField(
                 value = state.carb,
                 onValueChange = { vm.updateCarb(it) },
-                label = { Text("Carbs (g)") },
+                label = { Text("Углеводы") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -145,7 +145,7 @@ fun ProductCreateScreen(
             OutlinedTextField(
                 value = state.description,
                 onValueChange = { vm.updateDescription(it) },
-                label = { Text("Description") },
+                label = { Text("Описание") },
                 modifier = Modifier.fillMaxWidth(),
                 maxLines = 4,
             )
@@ -157,16 +157,16 @@ fun ProductCreateScreen(
             ) {
                 OutlinedTextField(
                     readOnly = true,
-                    value = state.category.name,
+                    value = state.category.getRu(),
                     onValueChange = {},
-                    label = { Text("Category") },
+                    label = { Text("Категория") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                     modifier = Modifier.menuAnchor(),
                 )
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     ProductCategory.entries.forEach { category ->
                         DropdownMenuItem(
-                            text = { Text(category.name) },
+                            text = { Text(category.getRu()) },
                             onClick = {
                                 vm.updateCategory(category)
                                 expanded = false
@@ -183,9 +183,9 @@ fun ProductCreateScreen(
             ) {
                 OutlinedTextField(
                     readOnly = true,
-                    value = state.cookingRequired.name,
+                    value = state.cookingRequired.getRu(),
                     onValueChange = {},
-                    label = { Text("Cooking Required") },
+                    label = { Text("Тип приготовления") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = cookingExpanded) },
                     modifier = Modifier.menuAnchor(),
                 )
@@ -195,7 +195,7 @@ fun ProductCreateScreen(
                 ) {
                     CookingRequired.entries.forEach { req ->
                         DropdownMenuItem(
-                            text = { Text(req.name) },
+                            text = { Text(req.getRu()) },
                             onClick = {
                                 vm.updateCookingRequired(req)
                                 cookingExpanded = false
@@ -215,16 +215,16 @@ fun ProductCreateScreen(
                         onClick = {
                             vm.updateFlags(category)
                         },
-                        label = { Text(category.name) },
+                        label = { Text(category.getRu()) },
                     )
                 }
             }
 
-            Text("Images", style = MaterialTheme.typography.titleMedium)
+            Text("Картинки", style = MaterialTheme.typography.titleMedium)
             OutlinedTextField(
                 value = newImageUrl,
                 onValueChange = { newImageUrl = it },
-                label = { Text("Enter image URL") },
+                label = { Text("Введите URL") },
                 trailingIcon = {
                     IconButton(
                         onClick = {
@@ -243,7 +243,7 @@ fun ProductCreateScreen(
                 onClick = { galleryLauncher.launch("image/*") },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Add image from gallery")
+                Text("Добавить из галереи")
             }
 
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -285,7 +285,7 @@ fun ProductCreateScreen(
                 if (state.isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp))
                 } else {
-                    Text("Create Product")
+                    Text("Создать")
                 }
             }
         }

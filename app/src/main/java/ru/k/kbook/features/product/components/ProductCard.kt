@@ -30,6 +30,7 @@ import ru.k.kbook.api.grpc.schema.CookingRequired
 import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.api.grpc.schema.ProductCategory
 import java.time.Instant
+import java.util.Collections.emptyList
 
 @Composable
 fun ProductCard(
@@ -75,11 +76,11 @@ fun ProductCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    "${product.caloricity} kcal/100g",
+                    "${product.caloricity} калории/100г",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Text(product.category.name, style = MaterialTheme.typography.labelMedium)
+                Text(product.category.getRu(), style = MaterialTheme.typography.labelMedium)
             }
             IconButton(
                 onClick = onDelete,

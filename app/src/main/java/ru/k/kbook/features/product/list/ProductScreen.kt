@@ -77,7 +77,7 @@ fun ProductScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("Loading...")
+            Text("Загрузка...")
             Spacer(modifier = Modifier.height(8.dp))
             CircularProgressIndicator()
         }
@@ -114,7 +114,7 @@ fun ProductScreenContent(
         modifier = Modifier
             .padding(bottom = 80.dp)
             .fillMaxSize(),
-        topBar = { TopAppBar(title = { Text("Products") }) },
+        topBar = { TopAppBar(title = { Text("Продукты") }) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreate,
@@ -142,7 +142,7 @@ fun ProductScreenContent(
                         viewModel.onSearchChange(it)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Search product") },
+                    label = { Text("Поиск") },
                     singleLine = true,
                     leadingIcon = {
                         Icon(Icons.Default.Search, contentDescription = null)
@@ -160,7 +160,7 @@ fun ProductScreenContent(
                             onClick = {
                                 viewModel.onCategoryToggle(category)
                             },
-                            label = { Text(category.name) },
+                            label = { Text(category.getRu()) },
                         )
                     }
                 }
@@ -176,7 +176,7 @@ fun ProductScreenContent(
                             onClick = {
                                 viewModel.onCookingToggle(category)
                             },
-                            label = { Text(category.name) },
+                            label = { Text(category.getRu()) },
                         )
                     }
                 }
@@ -192,7 +192,7 @@ fun ProductScreenContent(
                             onClick = {
                                 viewModel.onFlagToggle(category)
                             },
-                            label = { Text(category.name) },
+                            label = { Text(category.getRu()) },
                         )
                     }
                 }
@@ -210,7 +210,7 @@ fun ProductScreenContent(
                             FilterChip(
                                 selected = field == state.sortBy,
                                 onClick = { viewModel.onSort(field, state.sortDirection) },
-                                label = { Text(field.name) },
+                                label = { Text(field.getRu()) },
                             )
                         }
                     }
@@ -242,7 +242,7 @@ fun ProductScreenContent(
             if (state.products.isNotEmpty()) {
                 item {
                     Text(
-                        text = "${state.products.size} products found.",
+                        text = "${state.products.size} продуктов найдено.",
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
@@ -270,6 +270,6 @@ fun ProductScreenEmpty() {
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("Products are empty")
+        Text("Продуктов нет")
     }
 }

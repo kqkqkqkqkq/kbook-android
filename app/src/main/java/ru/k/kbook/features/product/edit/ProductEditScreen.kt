@@ -81,7 +81,7 @@ fun ProductEditScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Edit product", style = MaterialTheme.typography.headlineSmall)
+                    Text("Редактировать продукт", style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
@@ -111,42 +111,42 @@ fun ProductEditScreen(
                 onValueChange = {
                     vm.updateName(it)
                 },
-                label = { Text("Product Name") },
+                label = { Text("Имя продукта") },
                 modifier = Modifier.fillMaxWidth(),
             )
 
             OutlinedTextField(
                 value = state.caloricity,
                 onValueChange = vm::updateCaloricity,
-                label = { Text("Caloricity (kcal)") },
+                label = { Text("Калорийность") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = state.protein,
                 onValueChange = vm::updateProtein,
-                label = { Text("Protein (g)") },
+                label = { Text("Белки") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = state.fat,
                 onValueChange = vm::updateFat,
-                label = { Text("Fat (g)") },
+                label = { Text("Жиры") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = state.carb,
                 onValueChange = vm::updateCarb,
-                label = { Text("Carbs (g)") },
+                label = { Text("Углеводы") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
             )
             OutlinedTextField(
                 value = state.description,
                 onValueChange = vm::updateDescription,
-                label = { Text("Description") },
+                label = { Text("Описание") },
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -157,9 +157,9 @@ fun ProductEditScreen(
             ) {
                 OutlinedTextField(
                     readOnly = true,
-                    value = state.category.name,
+                    value = state.category.getRu(),
                     onValueChange = {},
-                    label = { Text("Category") },
+                    label = { Text("Категория") },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded)
                     },
@@ -171,7 +171,7 @@ fun ProductEditScreen(
                 ) {
                     ProductCategory.entries.forEach { category ->
                         DropdownMenuItem(
-                            text = { Text(category.name) },
+                            text = { Text(category.getRu()) },
                             onClick = {
                                 vm.updateCategory(category)
                                 categoryExpanded = false
@@ -188,9 +188,9 @@ fun ProductEditScreen(
             ) {
                 OutlinedTextField(
                     readOnly = true,
-                    value = state.cookingRequired.name,
+                    value = state.cookingRequired.getRu(),
                     onValueChange = {},
-                    label = { Text("Cooking Required") },
+                    label = { Text("Тип приготовления") },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = cookingExpanded)
                     },
@@ -202,7 +202,7 @@ fun ProductEditScreen(
                 ) {
                     CookingRequired.entries.forEach { req ->
                         DropdownMenuItem(
-                            text = { Text(req.name) },
+                            text = { Text(req.getRu()) },
                             onClick = {
                                 vm.updateCookingRequired(req)
                                 cookingExpanded = false
@@ -220,16 +220,16 @@ fun ProductEditScreen(
                     FilterChip(
                         selected = flag in state.flags,
                         onClick = { vm.toggleFlag(flag) },
-                        label = { Text(flag.name) },
+                        label = { Text(flag.getRu()) },
                     )
                 }
             }
 
-            Text("Images", style = MaterialTheme.typography.titleMedium)
+            Text("Картинки", style = MaterialTheme.typography.titleMedium)
             OutlinedTextField(
                 value = newImageUrl,
                 onValueChange = { newImageUrl = it },
-                label = { Text("Enter image URL") },
+                label = { Text("Введите URL") },
                 trailingIcon = {
                     IconButton(
                         onClick = {
@@ -248,7 +248,7 @@ fun ProductEditScreen(
                 onClick = { galleryLauncher.launch("image/*") },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text("Add image from gallery")
+                Text("Добавьте из галереи")
             }
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(state.images) { image ->
@@ -278,7 +278,7 @@ fun ProductEditScreen(
                 if (state.isSaving) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp))
                 } else {
-                    Text("Save")
+                    Text("Сохранить")
                 }
             }
         }
