@@ -13,8 +13,8 @@ enum class ProductCategory {
     ;
 
     fun getRu() = when (this) {
-        ProductCategory.FROZEN -> "Замороженное"
-        ProductCategory.MEAT -> "Мясо"
+        ProductCategory.FROZEN -> "Замороженный"
+        ProductCategory.MEAT -> "Мясной"
         ProductCategory.VEGETABLES -> "Овощи"
         ProductCategory.GREENS -> "Зелень"
         ProductCategory.SPICES -> "Специи"

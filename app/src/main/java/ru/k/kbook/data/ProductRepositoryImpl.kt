@@ -12,6 +12,7 @@ import ru.k.kbook.api.grpc.response.DeleteProductResponseDto
 import ru.k.kbook.api.grpc.response.ListProductsResponseDto
 import ru.k.kbook.api.grpc.response.ProductResponseDto
 import ru.k.kbook.domain.product.ProductRepository
+import java.util.Collections.emptyList
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,7 +29,8 @@ class ProductRepositoryImpl @Inject constructor(
 
     override suspend fun getProduct(id: GetProductRequestDto): ProductResponseDto {
         val product = productApi.getProduct(id)
-        Log.i("[Repository get]", "$product")
+        val productToPrint = product.product?.copy(images = emptyList())
+        Log.i("[Repository get]", "$productToPrint")
         return product
     }
 

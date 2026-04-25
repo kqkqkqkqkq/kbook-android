@@ -3,12 +3,12 @@ import com.google.protobuf.gradle.id
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    id("com.google.protobuf")
+    alias(libs.plugins.protobuf)
     alias(libs.plugins.kotlin.android)
-    kotlin("plugin.serialization") version "2.2.0"
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    id("org.jetbrains.kotlinx.kover") version "0.9.8"
+    alias(libs.plugins.kover)
 }
 
 android {
@@ -107,7 +107,7 @@ tasks.withType<Test> {
     val agentJar = configurations.getByName("agent").asPath
 
     jvmArgs = listOf(
-//        "-javaagent:${agentJar}",
+        "-javaagent:${agentJar}",
         "-XX:+EnableDynamicAgentLoading",
         "-Djdk.instrument.traceUsage=false"
     )
@@ -127,25 +127,27 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.compose.material.icons)
 
-    // Coroutines
-    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.datetime)
 
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
+
     // gRPC
-    implementation("io.grpc:grpc-protobuf:1.80.0")
-    implementation("io.grpc:grpc-stub:1.80.0")
-    implementation("io.grpc:grpc-okhttp:1.80.0")
-    implementation("io.grpc:grpc-kotlin-stub:1.5.0")
-    implementation("com.google.protobuf:protobuf-kotlin:4.31.1")
-    implementation("com.google.protobuf:protobuf-java:4.31.1")
+    implementation(libs.grpc.protobuf.lib)
+    implementation(libs.grpc.stub)
+    implementation(libs.grpc.okhttp)
+    implementation(libs.grpc.kotlin.stub)
+    implementation(libs.protobuf.kotlin)
+    implementation(libs.protobuf.java)
 
     // Navigation
-    implementation("androidx.navigation:navigation-compose:2.9.7")
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
     // Coil
-    implementation("io.coil-kt.coil3:coil-compose:3.4.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.4.0")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     // Hilt
     implementation(libs.hilt.android)
@@ -155,9 +157,10 @@ dependencies {
     // Allure
     testImplementation(platform("io.qameta.allure:allure-bom:2.25.0"))
     testImplementation("io.qameta.allure:allure-junit4")
-//    agent("org.aspectj:aspectjweaver:${aspectJVersion}")
-//    testImplementation("io.qameta.allure:allure-junit4-aspect")
+    agent("org.aspectj:aspectjweaver:${aspectJVersion}")
+    testImplementation("io.qameta.allure:allure-junit4-aspect")
 
+    // Testing
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
 

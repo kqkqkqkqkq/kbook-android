@@ -12,6 +12,8 @@ import ru.k.kbook.api.grpc.response.DishListResponseDto
 import ru.k.kbook.api.grpc.response.DishResponseDto
 import ru.k.kbook.api.grpc.response.ValidateDishResponseDto
 import ru.k.kbook.domain.dish.DishRepository
+import ru.k.kbook_api.grpc.dish.dish
+import java.util.Collections.emptyList
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,7 +37,8 @@ class DishRepositoryImpl @Inject constructor(
         Log.i("DishRepository", "getDish called with request: $request")
         return try {
             val response = api.getDish(request)
-            Log.i("DishRepository", "getDish success: $response")
+            val dishToPrint = response.dish?.copy(images = emptyList())
+            Log.i("DishRepository", "getDish success: $dishToPrint")
             response
         } catch (e: Exception) {
             Log.e("DishRepository", "getDish failed", e)

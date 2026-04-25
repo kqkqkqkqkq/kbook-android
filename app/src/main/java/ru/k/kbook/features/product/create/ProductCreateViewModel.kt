@@ -1,5 +1,6 @@
 package ru.k.kbook.features.product.create
 
+import android.R.attr.name
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -80,8 +81,20 @@ class ProductCreateViewModel @Inject constructor(
             println("Create product: ${_uiState.value}")
 
             try {
+                val name = _uiState.value.name
+                val caloricity = _uiState.value.caloricity.toDoubleOrNull()
+                val protein = _uiState.value.protein.toDoubleOrNull()
+                val fat = _uiState.value.fat.toDoubleOrNull()
+                val carb = _uiState.value.carb.toDoubleOrNull()
+
+                require(name.length >= 2) { "Название должно содержать не менее 2 символов" }
+                require(caloricity != null && caloricity >= 0) { "Калорийность не может быть меньше 0" }
+                require(protein != null && protein >= 0) { "Белки не могут быть меньше 0" }
+                require(fat != null && fat >= 0) { "Жиры не могут быть меньше 0" }
+                require(carb != null && carb >= 0) { "Углеводы не могут быть меньше 0" }
+
                 val product = CreateProductRequestDto(
-                    name = _uiState.value.name,
+                    name = name,
                     images = _uiState.value.images.map {
                         ImageInput(
                             id = it.id,
@@ -90,10 +103,10 @@ class ProductCreateViewModel @Inject constructor(
                             contentType = it.contentType,
                         )
                     },
-                    caloricity = _uiState.value.caloricity.toDoubleOrNull() ?: 0.0,
-                    protein = _uiState.value.protein.toDoubleOrNull() ?: 0.0,
-                    fat = _uiState.value.fat.toDoubleOrNull() ?: 0.0,
-                    carb = _uiState.value.carb.toDoubleOrNull() ?: 0.0,
+                    caloricity = caloricity,
+                    protein = protein,
+                    fat = fat,
+                    carb = carb,
                     description = _uiState.value.description.ifBlank { null },
                     category = _uiState.value.category,
                     cookingRequired = _uiState.value.cookingRequired,

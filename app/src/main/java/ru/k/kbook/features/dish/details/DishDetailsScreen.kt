@@ -30,9 +30,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import ru.k.kbook.R
 import ru.k.kbook.features.dish.components.ProductDishCard
+import ru.k.kbook.util.showDate
+import java.time.temporal.ChronoUnit
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,16 +112,13 @@ fun DishDetailsScreen(
                 item { Text("Порция: ${state.dish.portionSize} г") }
                 item { Text("Категория: ${state.dish.category.getRu()}") }
                 item { Text("Флаги: ${state.dish.flags.map{ it.getRu() }.joinToString()}") }
-                item { Text("Дата создания: ${state.dish.createdAt}") }
-                item { Text("Последнее обновление: ${state.dish.updatedAt}") }
+                item { Text("Дата создания: ${state.dish.createdAt.showDate()}") }
+                if (state.dish.createdAt.truncatedTo(ChronoUnit.SECONDS) !=
+                    state.dish.updatedAt.truncatedTo(ChronoUnit.SECONDS)) {
+                    item { Text("Последнее обновление: ${state.dish.updatedAt.showDate()}") }
+                }
                 item { Text("Состав:") }
                 items(state.products) { product ->
-//                    Text(
-//                        "- ${product.productName}: ${product.quantity} г",
-//                        modifier = Modifier.fillMaxWidth(),
-//                        maxLines = 1,
-//                        overflow = TextOverflow.Ellipsis,
-//                    )
                     ProductDishCard(
                         product = product.product,
                         quantity = product.quantity,

@@ -23,7 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import ru.k.kbook.R
 import ru.k.kbook.api.grpc.schema.ContentType
 import ru.k.kbook.api.grpc.schema.CookingRequired
@@ -55,16 +55,18 @@ fun ProductCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             val image = product.images.firstOrNull()
-            AsyncImage(
-                model = if (image?.contentType == ContentType.URL) image.url else image?.image,
-                contentDescription = product.name,
-                modifier = Modifier
-                    .size(72.dp)
-                    .clip(MaterialTheme.shapes.small),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(R.drawable.ic_launcher_background),
-                error = painterResource(R.drawable.ic_launcher_background),
-            )
+            if (image != null) {
+                AsyncImage(
+                    model = if (image.contentType == ContentType.URL) image.url else image.image,
+                    contentDescription = product.name,
+                    modifier = Modifier
+                        .size(72.dp)
+                        .clip(MaterialTheme.shapes.small),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.ic_launcher_background),
+                    error = painterResource(R.drawable.ic_launcher_background),
+                )
+            }
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -89,21 +91,3 @@ fun ProductCard(
         }
     }
 }
-
-@Preview
-@Composable
-private fun ProductPreview() {
-    ProductCard(
-        Product(
-            1L, "Name",
-            images = emptyList(), 15.0,
-            15.0, 15.0, 15.0,
-            "Description",
-            ProductCategory.MEAT, CookingRequired.REQUIRES_COOKING,
-            emptyList(), Instant.now(),
-            Instant.now(),
-        ),
-        {}, {},
-    )
-}
-

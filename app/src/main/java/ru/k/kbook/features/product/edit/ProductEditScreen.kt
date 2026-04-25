@@ -41,18 +41,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
+import ru.k.kbook.R
 import ru.k.kbook.api.grpc.schema.ContentType
 import ru.k.kbook.api.grpc.schema.CookingRequired
 import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
-import ru.k.kbook.features.product.ProductImagePreview
 import ru.k.kbook.features.product.contextUriToProductImage
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,6 +100,7 @@ fun ProductEditScreen(
         if (state.isLoading) {
             Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                return@Scaffold
             }
         }
 
@@ -146,7 +152,7 @@ fun ProductEditScreen(
             OutlinedTextField(
                 value = state.description,
                 onValueChange = vm::updateDescription,
-                label = { Text("Описание") },
+                label = { Text("Состав") },
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -252,9 +258,18 @@ fun ProductEditScreen(
             }
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(state.images) { image ->
-                    androidx.compose.material3.Card(modifier = Modifier.size(100.dp)) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            ProductImagePreview(image)
+                    androidx.compose.material3.Card(modifier = Modifier.size(72.dp)) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
+                            AsyncImage(
+                                model = if (image.contentType == ContentType.URL) image.url else image.image,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(MaterialTheme.shapes.small),
+                                contentScale = ContentScale.Crop,
+                                placeholder = painterResource(R.drawable.ic_launcher_background),
+                                error = painterResource(R.drawable.ic_launcher_background),
+                            )
                             IconButton(
                                 modifier = Modifier.size(24.dp),
                                 onClick = { vm.removeImage(image) },

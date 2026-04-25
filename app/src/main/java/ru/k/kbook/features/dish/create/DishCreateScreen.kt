@@ -98,7 +98,10 @@ fun DishCreateScreen(
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
-            ) { CircularProgressIndicator() }
+            ) {
+                CircularProgressIndicator()
+                return@Scaffold
+            }
         }
         Column(
             modifier = Modifier
@@ -154,7 +157,7 @@ fun DishCreateScreen(
             OutlinedTextField(
                 state.caloricity,
                 vm::updateCaloricity,
-                label = { Text("Калории на порцию (draft: ${state.autoCaloricity})") },
+                label = { Text("Калории на порцию (авто: ${state.autoCaloricity})") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -162,21 +165,21 @@ fun DishCreateScreen(
                 OutlinedTextField(
                     state.protein,
                     vm::updateProtein,
-                    label = { Text("Б (draft: ${state.autoProtein.round1()})") },
+                    label = { Text("Б (авто: ${state.autoProtein.round1()})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(1f),
                 )
                 OutlinedTextField(
                     state.fat,
                     vm::updateFat,
-                    label = { Text("Ж (draft: ${state.autoFat.round1()})") },
+                    label = { Text("Ж (авто: ${state.autoFat.round1()})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(1f),
                 )
                 OutlinedTextField(
                     state.carb,
                     vm::updateCarb,
-                    label = { Text("У (draft: ${state.autoCarb.round1()})") },
+                    label = { Text("У (авто: ${state.autoCarb.round1()})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(1f),
                 )

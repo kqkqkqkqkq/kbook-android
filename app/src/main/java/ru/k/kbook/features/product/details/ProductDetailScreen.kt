@@ -35,14 +35,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import ru.k.kbook.R
 import ru.k.kbook.api.grpc.schema.ContentType
 import ru.k.kbook.api.grpc.schema.CookingRequired
 import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.api.grpc.schema.ProductImage
+import ru.k.kbook.util.showDate
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.Collections.emptyList
 
 @Composable
@@ -136,15 +138,21 @@ fun ProductDetailScreenContent(
                     )
                 }
             }
-            Text("каллорийность: ${product.caloricity} | белки ${product.protein} | жиры ${product.fat} | углеводы ${product.carb}")
+            Text("Каллорийность: ${product.caloricity}")
+            Text("Белки ${product.protein}")
+            Text("Жиры ${product.fat}")
+            Text("Углеводы ${product.carb}")
             if (!product.description.isNullOrEmpty()) {
-                Text(product.description)
+                Text("Состав: ${product.description}")
             }
             Text("Категория: ${product.category.getRu()}")
             Text("Тип приготовления: ${product.cookingRequired.getRu()}")
             Text("Флаги: ${product.flags.map{ it.getRu() }.joinToString()}")
-            Text("Дата создания: ${product.createdAt}")
-            Text("Дата редактирования: ${product.updatedAt}")
+            if (product.createdAt.truncatedTo(ChronoUnit.SECONDS) !=
+                product.updatedAt.truncatedTo(ChronoUnit.SECONDS)) {
+                Text("Дата редактирования: ${product.updatedAt.showDate()}")
+            }
+            Text("Дата создания: ${product.createdAt.showDate()}")
         }
     }
 }

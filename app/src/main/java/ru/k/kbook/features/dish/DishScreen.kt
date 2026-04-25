@@ -110,7 +110,7 @@ private fun DishListContent(
             }
             item {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(DishCategory.entries) { item ->
+                    items(DishCategory.values()) { item ->
                         FilterChip(
                             selected = item in state.categories,
                             onClick = { vm.onCategory(item) },
@@ -121,7 +121,7 @@ private fun DishListContent(
             }
             item {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(DishFlag.entries) { item ->
+                    items(DishFlag.values()) { item ->
                         FilterChip(
                             selected = item in state.flags,
                             onClick = { vm.onFlag(item) },

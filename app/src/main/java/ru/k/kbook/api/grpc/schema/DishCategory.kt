@@ -17,6 +17,6 @@ enum class DishCategory {
         DishCategory.DRINK -> "Напиток"
         DishCategory.SALAD -> "Салат"
         DishCategory.SOUP -> "Суп"
-        DishCategory.SNACK -> "Закуска"
+        DishCategory.SNACK -> "Перекус"
     }
 }

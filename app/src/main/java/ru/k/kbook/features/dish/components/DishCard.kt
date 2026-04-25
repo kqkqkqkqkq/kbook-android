@@ -22,7 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import ru.k.kbook.R
 import ru.k.kbook.api.grpc.schema.Dish
 
@@ -50,16 +50,18 @@ fun DishCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             val image = dish.images.firstOrNull()
-            AsyncImage(
-                model = if (image?.contentType == "url") image.url else image?.image,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(MaterialTheme.shapes.small),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(R.drawable.ic_launcher_background),
-                error = painterResource(R.drawable.ic_launcher_background),
-            )
+            if (image != null) {
+                AsyncImage(
+                    model = if (image.contentType == "url") image.url else image.image,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(MaterialTheme.shapes.small),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.ic_launcher_background),
+                    error = painterResource(R.drawable.ic_launcher_background),
+                )
+            }
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -71,11 +73,11 @@ fun DishCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    "${dish.caloricity} kcal/порция",
+                    "${dish.caloricity} ккал/порция",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Text(dish.category.name, style = MaterialTheme.typography.labelMedium)
+                Text(dish.category.getRu(), style = MaterialTheme.typography.labelMedium)
                 Text("Порция: ${dish.portionSize} г", style = MaterialTheme.typography.labelMedium)
             }
             IconButton(onClick = { onDelete(dish) }, shape = MaterialTheme.shapes.small) {

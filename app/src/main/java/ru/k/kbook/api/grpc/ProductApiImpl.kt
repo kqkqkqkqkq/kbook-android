@@ -1,5 +1,6 @@
 package ru.k.kbook.api.grpc
 
+import android.util.Log
 import ru.k.kbook.api.grpc.request.CreateProductRequestDto
 import ru.k.kbook.api.grpc.request.DeleteProductRequestDto
 import ru.k.kbook.api.grpc.request.GetProductRequestDto
@@ -33,7 +34,9 @@ class ProductApiImpl @Inject constructor(
     override suspend fun getProduct(id: GetProductRequestDto): ProductResponseDto {
         val request = id.toGrpc()
         val response = stub.getProduct(request)
-        return response.toKotlin()
+        println("$response")
+        val product = response.toKotlin()
+        return product
     }
 
     override suspend fun updateProduct(product: UpdateProductRequestDto): ProductResponseDto {
