@@ -168,10 +168,6 @@ class DishEditViewModel @Inject constructor(
             autoCarb = auto.carb,
             availableFlags = availableFlags,
             flags = s.flags.intersect(availableFlags),
-            caloricity = if (nutritionManuallyEdited) s.caloricity else auto.caloricity.round1(),
-            protein = if (nutritionManuallyEdited) s.protein else auto.protein.round1(),
-            fat = if (nutritionManuallyEdited) s.fat else auto.fat.round1(),
-            carb = if (nutritionManuallyEdited) s.carb else auto.carb.round1(),
         )
     }
 

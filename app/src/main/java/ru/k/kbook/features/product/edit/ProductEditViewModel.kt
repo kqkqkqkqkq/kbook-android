@@ -14,6 +14,7 @@ import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
 import ru.k.kbook.domain.product.ProductRepository
+import java.util.Collections.emptyList
 import javax.inject.Inject
 
 // TODO("нельзя удалить картинку из продукта при редактировании, одна остается обязательно")
@@ -86,6 +87,17 @@ class ProductEditViewModel @Inject constructor(
         viewModelScope.launch {
             update { it.copy(isSaving = true, error = null) }
             runCatching {
+                val name = current.name
+                val caloricity = current.caloricity.toDoubleOrNull()
+                val protein = current.protein.toDoubleOrNull()
+                val fat = current.fat.toDoubleOrNull()
+                val carb = current.carb.toDoubleOrNull()
+                require(current.images.size <= 5) { "Продукт не может содержать больше 5 картинок" }
+                require(name.length >= 2) { "Название должно содержать не менее 2 символов" }
+                require(caloricity != null && caloricity >= 0) { "Калорийность не может быть меньше 0" }
+                require(protein != null && protein >= 0) { "Белки не могут быть меньше 0" }
+                require(fat != null && fat >= 0) { "Жиры не могут быть меньше 0" }
+                require(carb != null && carb >= 0) { "Углеводы не могут быть меньше 0" }
                 repository.updateProduct(
                     UpdateProductRequestDto(
                         id = productId,

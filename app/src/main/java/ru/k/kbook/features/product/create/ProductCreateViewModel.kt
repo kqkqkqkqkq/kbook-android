@@ -87,6 +87,7 @@ class ProductCreateViewModel @Inject constructor(
                 val fat = _uiState.value.fat.toDoubleOrNull()
                 val carb = _uiState.value.carb.toDoubleOrNull()
 
+                require(_uiState.value.images.size <= 5) { "Продукт не может содержать больше 5 картинок" }
                 require(name.length >= 2) { "Название должно содержать не менее 2 символов" }
                 require(caloricity != null && caloricity >= 0) { "Калорийность не может быть меньше 0" }
                 require(protein != null && protein >= 0) { "Белки не могут быть меньше 0" }

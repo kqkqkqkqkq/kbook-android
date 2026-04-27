@@ -98,7 +98,8 @@ class DishCreateViewModel @Inject constructor(
     fun addCompositionItem() {
         val state = _uiState.value
         val product = state.products.firstOrNull { it.id == state.selectedProductId } ?: return
-        if (state.selectedQuantity.toDoubleOrNull() == null) return
+        val q = state.selectedQuantity.toDoubleOrNull() ?: return
+        if (q < 0) return
         _uiState.value = state.copy(
             composition = state.composition + DishCompositionInput(
                 product.id,
@@ -175,6 +176,12 @@ class DishCreateViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true)
             runCatching {
+                require(state.images.size <= 5) { "Максимальное количество картинок: 5" }
+                require(portion >= 0) { "Размер порции не может быть отрицательным" }
+                require(cal >= 0) { "Количество каллорий не может быть отрицательным" }
+                require(protein >= 0) { "Количество белков не может быть отрицательным" }
+                require(fat >= 0) { "Количество жиров не может быть отрицательным" }
+                require(carb >= 0) { "Количество углеводов не может быть отрицательным" }
                 dishRepo.createDish(
                     CreateDishRequestDto(
                         name = state.name,

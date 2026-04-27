@@ -134,7 +134,7 @@ fun DishEditScreen(
             ) {
                 OutlinedTextField(
                     readOnly = true,
-                    value = state.category?.name ?: "Не выбрано",
+                    value = state.category?.getRu() ?: "Не выбрано",
                     onValueChange = {},
                     label = { Text("Категория") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(categoryExpanded) },
@@ -152,7 +152,7 @@ fun DishEditScreen(
                     )
                     DishCategory.entries.forEach { item ->
                         DropdownMenuItem(
-                            text = { Text(item.name) },
+                            text = { Text(item.getRu()) },
                             onClick = { vm.updateCategory(item); categoryExpanded = false },
                         )
                     }
@@ -253,7 +253,7 @@ fun DishEditScreen(
                     selected = flag in state.flags,
                     onClick = { vm.toggleFlag(flag) },
                     enabled = flag in state.availableFlags,
-                    label = { Text(flag.name) },
+                    label = { Text(flag.getRu()) },
                 )
             }
             OutlinedTextField(

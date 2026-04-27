@@ -130,7 +130,7 @@ fun DishCreateScreen(
             ) {
                 OutlinedTextField(
                     readOnly = true,
-                    value = state.category?.name ?: "Не выбрано",
+                    value = state.category?.getRu() ?: "Не выбрано",
                     onValueChange = {},
                     label = { Text("Категория") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(categoryExpanded) },
@@ -148,7 +148,7 @@ fun DishCreateScreen(
                     )
                     DishCategory.entries.forEach { item ->
                         DropdownMenuItem(
-                            text = { Text(item.name) },
+                            text = { Text(item.getRu()) },
                             onClick = { vm.updateCategory(item); categoryExpanded = false },
                         )
                     }
@@ -157,7 +157,7 @@ fun DishCreateScreen(
             OutlinedTextField(
                 state.caloricity,
                 vm::updateCaloricity,
-                label = { Text("Калории на порцию (авто: ${state.autoCaloricity})") },
+                label = { Text("Калории на порцию (авто: ${state.autoCaloricity.round1()})") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -244,7 +244,7 @@ fun DishCreateScreen(
                     selected = flag in state.flags,
                     onClick = { vm.toggleFlag(flag) },
                     enabled = flag in state.availableFlags,
-                    label = { Text(flag.name) },
+                    label = { Text(flag.getRu()) },
                 )
             }
             OutlinedTextField(
