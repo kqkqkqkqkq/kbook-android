@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -73,7 +74,9 @@ fun ProductScreen(
     }
     when (val state = viewModel.uiState.collectAsStateWithLifecycle().value) {
         ProductListUiState.Loading -> Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag(ProductScreenTag.LOADING),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -83,7 +86,9 @@ fun ProductScreen(
         }
 
         is ProductListUiState.Error -> Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag(ProductScreenTag.ERROR),
             contentAlignment = Alignment.Center,
         ) { Text(state.message) }
 
@@ -113,7 +118,8 @@ fun ProductScreenContent(
     Scaffold(
         modifier = Modifier
             .padding(bottom = 80.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .testTag(ProductScreenTag.CONTENT),
         topBar = { TopAppBar(title = { Text("Продукты") }) },
         floatingActionButton = {
             FloatingActionButton(
@@ -270,6 +276,9 @@ fun ProductScreenEmpty() {
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("Продуктов нет")
+        Text(
+            text = "Продуктов нет",
+            modifier = Modifier.testTag(ProductScreenTag.EMPTY),
+        )
     }
 }

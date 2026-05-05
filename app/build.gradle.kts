@@ -22,7 +22,11 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "ru.k.kbook.HiltTestRunner"
+    }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
     }
 
     buildTypes {
@@ -41,20 +45,6 @@ android {
     buildFeatures {
         compose = true
     }
-//    sourceSets {
-//        getByName("main") {
-//            java.srcDirs(
-//                "src/main/java",
-//                "src/main/kotlin",
-//                "build/generated/source/proto/debug/java",
-//                "build/generated/source/proto/debug/grpc",
-//                "build/generated/source/proto/debug/grpcKt",
-//                "build/generated/source/proto/debug/kotlin",
-//                "build/generated/ksp/debug/java"
-//            )
-//            kotlin.srcDirs("src/main/java")
-//        }
-//    }
 }
 
 protobuf {
@@ -161,8 +151,13 @@ dependencies {
     testImplementation("io.qameta.allure:allure-junit4-aspect")
 
     // Testing
+    testImplementation(kotlin("test"))
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+
+    // Hilt testing
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.56.2")
+    kspAndroidTest("com.google.dagger:hilt-android-compiler:2.56.2")
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

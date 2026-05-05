@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,6 +30,7 @@ import ru.k.kbook.api.grpc.schema.ContentType
 import ru.k.kbook.api.grpc.schema.CookingRequired
 import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.api.grpc.schema.ProductCategory
+import ru.k.kbook.features.product.list.ProductScreenTag
 import java.time.Instant
 import java.util.Collections.emptyList
 
@@ -39,7 +41,9 @@ fun ProductCard(
     onDelete: () -> Unit,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(ProductScreenTag.PRODUCT_CARD),
         onClick = {
             onNavigate(product)
         },
@@ -72,10 +76,11 @@ fun ProductCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
                 Text(
-                    product.name,
+                    text = product.name,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.testTag(ProductScreenTag.PRODUCT_CARD_TITLE),
                 )
                 Text(
                     "${product.caloricity} калории/100г",
