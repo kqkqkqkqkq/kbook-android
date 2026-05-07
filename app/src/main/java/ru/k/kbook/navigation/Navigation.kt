@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -58,6 +59,7 @@ fun Navigation() {
                         },
                         icon = { Icon(Icons.Default.ShoppingCart, contentDescription = null) },
                         label = { Text("Продукты") },
+                        modifier = Modifier.testTag(NavigationTag.PRODUCTS),
                     )
                     NavigationBarItem(
                         selected = currentDestination?.hierarchy?.any { it.route == dishesRoute } == true,
@@ -70,6 +72,7 @@ fun Navigation() {
                         },
                         icon = { Icon(Icons.Default.List, contentDescription = null) },
                         label = { Text("Блюда") },
+                        modifier = Modifier.testTag(NavigationTag.DISHES)
                     )
                 }
             }

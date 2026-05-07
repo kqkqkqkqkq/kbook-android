@@ -5,6 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -89,17 +92,29 @@ fun ProductEditScreen(
                     Text("Редактировать продукт", style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.testTag(ProductEditScreenTag.BACK_BUTTON),
+                    ) {
                         Icon(Icons.Default.ArrowBack, null)
                     }
                 },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.testTag(ProductEditScreenTag.SNACKBAR),
+            )
+        },
     ) { padding ->
         if (state.isLoading) {
             Box(modifier = Modifier.fillMaxSize()) {
-                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .testTag(ProductEditScreenTag.LOADING),
+                )
                 return@Scaffold
             }
         }
@@ -109,7 +124,8 @@ fun ProductEditScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .testTag(ProductEditScreenTag.SCROLLABLE_COLUMN),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             OutlinedTextField(
@@ -118,7 +134,9 @@ fun ProductEditScreen(
                     vm.updateName(it)
                 },
                 label = { Text("Имя продукта") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductEditScreenTag.NAME_INPUT),
             )
 
             OutlinedTextField(
@@ -126,34 +144,44 @@ fun ProductEditScreen(
                 onValueChange = vm::updateCaloricity,
                 label = { Text("Калорийность") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductEditScreenTag.CALORICITY_INPUT),
             )
             OutlinedTextField(
                 value = state.protein,
                 onValueChange = vm::updateProtein,
                 label = { Text("Белки") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductEditScreenTag.PROTEIN_INPUT),
             )
             OutlinedTextField(
                 value = state.fat,
                 onValueChange = vm::updateFat,
                 label = { Text("Жиры") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductEditScreenTag.FAT_INPUT),
             )
             OutlinedTextField(
                 value = state.carb,
                 onValueChange = vm::updateCarb,
                 label = { Text("Углеводы") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductEditScreenTag.CARB_INPUT),
             )
             OutlinedTextField(
                 value = state.description,
                 onValueChange = vm::updateDescription,
                 label = { Text("Состав") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductEditScreenTag.DESCRIPTION_INPUT),
             )
 
             var categoryExpanded by remember { mutableStateOf(false) }
@@ -169,7 +197,9 @@ fun ProductEditScreen(
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded)
                     },
-                    modifier = Modifier.menuAnchor(),
+                    modifier = Modifier
+                        .menuAnchor()
+                        .testTag(ProductEditScreenTag.CATEGORY_INPUT),
                 )
                 ExposedDropdownMenu(
                     expanded = categoryExpanded,
@@ -182,6 +212,7 @@ fun ProductEditScreen(
                                 vm.updateCategory(category)
                                 categoryExpanded = false
                             },
+                            modifier = Modifier.testTag("${ProductEditScreenTag.PREFIX}${category.name}"),
                         )
                     }
                 }
@@ -200,7 +231,9 @@ fun ProductEditScreen(
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = cookingExpanded)
                     },
-                    modifier = Modifier.menuAnchor(),
+                    modifier = Modifier
+                        .menuAnchor()
+                        .testTag(ProductEditScreenTag.COOKING_REQUIRED_INPUT),
                 )
                 ExposedDropdownMenu(
                     expanded = cookingExpanded,
@@ -213,12 +246,13 @@ fun ProductEditScreen(
                                 vm.updateCookingRequired(req)
                                 cookingExpanded = false
                             },
+                            modifier = Modifier.testTag("${ProductEditScreenTag.PREFIX}${req.name}"),
                         )
                     }
                 }
             }
 
-            androidx.compose.foundation.layout.FlowRow(
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
@@ -227,6 +261,7 @@ fun ProductEditScreen(
                         selected = flag in state.flags,
                         onClick = { vm.toggleFlag(flag) },
                         label = { Text(flag.getRu()) },
+                        modifier = Modifier.testTag("${ProductEditScreenTag.PREFIX}${flag.name}"),
                     )
                 }
             }
@@ -244,11 +279,14 @@ fun ProductEditScreen(
                                 newImageUrl = ""
                             }
                         },
+                        modifier = Modifier.testTag(ProductEditScreenTag.ADD_IMAGE_BUTTON),
                     ) {
                         Icon(Icons.Default.Add, contentDescription = "Add URL")
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductEditScreenTag.URL_INPUT),
             )
             Button(
                 onClick = { galleryLauncher.launch("image/*") },
@@ -258,8 +296,11 @@ fun ProductEditScreen(
             }
             LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(state.images) { image ->
-                    androidx.compose.material3.Card(modifier = Modifier.size(72.dp)) {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
+                    Card(modifier = Modifier.size(72.dp)) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.TopEnd,
+                        ) {
                             AsyncImage(
                                 model = if (image.contentType == ContentType.URL) image.url else image.image,
                                 contentDescription = null,
@@ -271,7 +312,9 @@ fun ProductEditScreen(
                                 error = painterResource(R.drawable.ic_launcher_background),
                             )
                             IconButton(
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .testTag(ProductEditScreenTag.REMOVE_IMAGE_BUTTON),
                                 onClick = { vm.removeImage(image) },
                             ) {
                                 Icon(
@@ -288,7 +331,9 @@ fun ProductEditScreen(
             Button(
                 onClick = { vm.save(id, onNavigateBack) },
                 enabled = !state.isSaving,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductEditScreenTag.SAVE_BUTTON),
             ) {
                 if (state.isSaving) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp))

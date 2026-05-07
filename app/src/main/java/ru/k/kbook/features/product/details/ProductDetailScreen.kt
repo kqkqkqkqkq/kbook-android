@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,7 +68,9 @@ fun ProductDetailScreen(
         ) {
             Text("Загрузка...")
             Spacer(modifier = Modifier.height(8.dp))
-            CircularProgressIndicator()
+            CircularProgressIndicator(
+                modifier = Modifier.testTag(ProductDetailScreenTag.LOADING)
+            )
         }
 
         is ProductDetailUiState.Error -> Box(
@@ -101,15 +104,24 @@ fun ProductDetailScreenContent(
                         style = MaterialTheme.typography.headlineSmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.testTag(ProductDetailScreenTag.TITLE),
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.testTag(ProductDetailScreenTag.BACK_BUTTON),
+                    ) {
                         Icon(Icons.Default.ArrowBack, null)
                     }
                 },
                 actions = {
-                    IconButton(onClick = { onNavigateToEdit(product.id) }) {
+                    IconButton(
+                        onClick = {
+                            onNavigateToEdit(product.id)
+                        },
+                        modifier = Modifier.testTag(ProductDetailScreenTag.EDIT_BUTTON),
+                    ) {
                         Icon(Icons.Default.Edit, null)
                     }
                 },
@@ -131,28 +143,60 @@ fun ProductDetailScreenContent(
                         contentDescription = product.name,
                         modifier = Modifier
                             .size(128.dp)
-                            .clip(MaterialTheme.shapes.small),
+                            .clip(MaterialTheme.shapes.small)
+                            .testTag(ProductDetailScreenTag.IMAGE),
                         contentScale = ContentScale.Crop,
                         placeholder = painterResource(R.drawable.ic_launcher_background),
                         error = painterResource(R.drawable.ic_launcher_background),
                     )
                 }
             }
-            Text("Каллорийность: ${product.caloricity}")
-            Text("Белки ${product.protein}")
-            Text("Жиры ${product.fat}")
-            Text("Углеводы ${product.carb}")
+            Text(
+                text = "Каллорийность: ${product.caloricity}",
+                modifier = Modifier.testTag(ProductDetailScreenTag.CALORICITY),
+            )
+            Text(
+                text = "Белки ${product.protein}",
+                modifier = Modifier.testTag(ProductDetailScreenTag.PROTEIN),
+            )
+            Text(
+                text = "Жиры ${product.fat}",
+                modifier = Modifier.testTag(ProductDetailScreenTag.FAT),
+            )
+            Text(
+                text = "Углеводы ${product.carb}",
+                modifier = Modifier.testTag(ProductDetailScreenTag.CARB),
+            )
             if (!product.description.isNullOrEmpty()) {
-                Text("Состав: ${product.description}")
+                Text(
+                    text = "Состав: ${product.description}",
+                    modifier = Modifier.testTag(ProductDetailScreenTag.DESCRIPTION),
+                )
             }
-            Text("Категория: ${product.category.getRu()}")
-            Text("Тип приготовления: ${product.cookingRequired.getRu()}")
-            Text("Флаги: ${product.flags.map{ it.getRu() }.joinToString()}")
+            Text(
+                text = "Категория: ${product.category.getRu()}",
+                modifier = Modifier.testTag(ProductDetailScreenTag.CATEGORY),
+            )
+            Text(
+                text = "Тип приготовления: ${product.cookingRequired.getRu()}",
+                modifier = Modifier.testTag(ProductDetailScreenTag.COOKING_REQUIRED),
+            )
+            Text(
+                text = "Флаги: ${product.flags.map { it.getRu() }.joinToString()}",
+                modifier = Modifier.testTag(ProductDetailScreenTag.FLAGS),
+            )
             if (product.createdAt.truncatedTo(ChronoUnit.SECONDS) !=
                 product.updatedAt.truncatedTo(ChronoUnit.SECONDS)) {
-                Text("Дата редактирования: ${product.updatedAt.showDate()}")
+
+                Text(
+                    text = "Дата редактирования: ${product.updatedAt.showDate()}",
+                    modifier = Modifier.testTag(ProductDetailScreenTag.UPDATE_DATE),
+                )
             }
-            Text("Дата создания: ${product.createdAt.showDate()}")
+            Text(
+                text = "Дата создания: ${product.createdAt.showDate()}",
+                modifier = Modifier.testTag(ProductDetailScreenTag.CREATE_DATE),
+            )
         }
     }
 }

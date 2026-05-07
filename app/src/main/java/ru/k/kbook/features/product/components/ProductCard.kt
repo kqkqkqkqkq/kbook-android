@@ -92,6 +92,7 @@ fun ProductCard(
             IconButton(
                 onClick = onDelete,
                 shape = MaterialTheme.shapes.small,
+                modifier = Modifier.testTag(ProductScreenTag.DELETE_PRODUCT_BUTTON),
             ) { Icon(Icons.Filled.Delete, contentDescription = null) }
         }
     }

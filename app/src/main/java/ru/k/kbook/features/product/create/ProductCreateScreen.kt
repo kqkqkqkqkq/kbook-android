@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -48,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -61,6 +63,7 @@ import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.api.grpc.schema.ProductFlag
 import ru.k.kbook.api.grpc.schema.ProductImage
 import ru.k.kbook.features.product.contextUriToProductImage
+import ru.k.kbook.features.product.list.ProductScreenTag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,13 +93,23 @@ fun ProductCreateScreen(
                     Text("Новый продукт", style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier
+                            .testTag(ProductCreateScreenTag.BACK_BUTTON),
+                    ) {
                         Icon(Icons.Default.ArrowBack, null)
                     }
                 },
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .testTag(ProductCreateScreenTag.SNACKBAR),
+            )
+        },
     ) { padding ->
 
         Column(
@@ -104,14 +117,17 @@ fun ProductCreateScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .testTag(ProductCreateScreenTag.SCROLLABLE_COLUMN),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             OutlinedTextField(
                 value = state.name,
                 onValueChange = { vm.updateName(it) },
                 label = { Text("Название") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductCreateScreenTag.NAME_INPUT),
             )
 
             OutlinedTextField(
@@ -119,7 +135,9 @@ fun ProductCreateScreen(
                 onValueChange = { vm.updateCaloricity(it) },
                 label = { Text("Калорийность") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductCreateScreenTag.CALORICITY_INPUT),
             )
 
             OutlinedTextField(
@@ -127,7 +145,9 @@ fun ProductCreateScreen(
                 onValueChange = { vm.updateProtein(it) },
                 label = { Text("Белки") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductCreateScreenTag.PROTEIN_INPUT),
             )
 
             OutlinedTextField(
@@ -135,7 +155,9 @@ fun ProductCreateScreen(
                 onValueChange = { vm.updateFat(it) },
                 label = { Text("Жиры") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductCreateScreenTag.FAT_INPUT),
             )
 
             OutlinedTextField(
@@ -143,15 +165,19 @@ fun ProductCreateScreen(
                 onValueChange = { vm.updateCarb(it) },
                 label = { Text("Углеводы") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductCreateScreenTag.CARB_INPUT),
             )
 
             OutlinedTextField(
                 value = state.description,
                 onValueChange = { vm.updateDescription(it) },
                 label = { Text("Состав") },
-                modifier = Modifier.fillMaxWidth(),
                 maxLines = 4,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductCreateScreenTag.DESCRIPTION_INPUT),
             )
 
             var expanded by remember { mutableStateOf(false) }
@@ -165,7 +191,9 @@ fun ProductCreateScreen(
                     onValueChange = {},
                     label = { Text("Категория") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor(),
+                    modifier = Modifier
+                        .menuAnchor()
+                        .testTag(ProductCreateScreenTag.CATEGORY_INPUT),
                 )
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     ProductCategory.entries.forEach { category ->
@@ -175,6 +203,7 @@ fun ProductCreateScreen(
                                 vm.updateCategory(category)
                                 expanded = false
                             },
+                            modifier = Modifier.testTag("${ProductCreateScreenTag.PREFIX}_${category.name}"),
                         )
                     }
                 }
@@ -191,7 +220,9 @@ fun ProductCreateScreen(
                     onValueChange = {},
                     label = { Text("Тип приготовления") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = cookingExpanded) },
-                    modifier = Modifier.menuAnchor(),
+                    modifier = Modifier
+                        .menuAnchor()
+                        .testTag(ProductCreateScreenTag.COOKING_REQUIRED_INPUT),
                 )
                 ExposedDropdownMenu(
                     expanded = cookingExpanded,
@@ -204,6 +235,7 @@ fun ProductCreateScreen(
                                 vm.updateCookingRequired(req)
                                 cookingExpanded = false
                             },
+                            modifier = Modifier.testTag("${ProductCreateScreenTag.PREFIX}_${req.name}"),
                         )
                     }
                 }
@@ -220,6 +252,7 @@ fun ProductCreateScreen(
                             vm.updateFlags(category)
                         },
                         label = { Text(category.getRu()) },
+                        modifier = Modifier.testTag("${ProductCreateScreenTag.PREFIX}_${category.name}"),
                     )
                 }
             }
@@ -237,11 +270,14 @@ fun ProductCreateScreen(
                                 newImageUrl = ""
                             }
                         },
+                        modifier = Modifier.testTag(ProductCreateScreenTag.ADD_IMAGE_BUTTON),
                     ) {
                         Icon(Icons.Default.Add, contentDescription = "Add URL")
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductCreateScreenTag.URL_INPUT),
             )
             Button(
                 onClick = { galleryLauncher.launch("image/*") },
@@ -268,7 +304,9 @@ fun ProductCreateScreen(
                                 error = painterResource(R.drawable.ic_launcher_background),
                             )
                             IconButton(
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .testTag(ProductCreateScreenTag.REMOVE_IMAGE_BUTTON),
                                 onClick = { vm.removeImageUrl(image) },
                             ) {
                                 Icon(
@@ -287,7 +325,9 @@ fun ProductCreateScreen(
                     vm.createProduct { onNavigateBack() }
                 },
                 enabled = !state.isLoading,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(ProductCreateScreenTag.SAVE_BUTTON),
             ) {
                 if (state.isLoading) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp))

@@ -18,3 +18,9 @@
 > ```powershell
 > allure serve --results app/build/allure-results
 > ```
+
+> **Запуск UI тестов**
+>
+> ```powershell
+> ./gradlew :app:connectedDebugAndroidTest
+> ```

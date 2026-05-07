@@ -75,6 +75,13 @@ protobuf {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("com.google.protobuf:protobuf-java:4.31.1")
+        force("com.google.protobuf:protobuf-kotlin:4.31.1")
+    }
+}
+
 val aspectJVersion = "1.9.21"
 
 val agent: Configuration by configurations.creating {
@@ -169,7 +176,13 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     val kaspresso = "1.6.1"
-    androidTestImplementation("com.kaspersky.android-components:kaspresso:$kaspresso")
-    androidTestImplementation("com.kaspersky.android-components:kaspresso-allure-support:$kaspresso")
-    androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:$kaspresso")
+    androidTestImplementation("com.kaspersky.android-components:kaspresso:$kaspresso") {
+        exclude(group = "com.google.protobuf", module = "protobuf-lite")
+    }
+    androidTestImplementation("com.kaspersky.android-components:kaspresso-allure-support:$kaspresso") {
+        exclude(group = "com.google.protobuf", module = "protobuf-lite")
+    }
+    androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:$kaspresso") {
+        exclude(group = "com.google.protobuf", module = "protobuf-lite")
+    }
 }

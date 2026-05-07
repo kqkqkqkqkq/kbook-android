@@ -1,5 +1,6 @@
 package ru.k.kbook.features.product.list
 
+import android.R.attr.category
 import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -124,6 +125,7 @@ fun ProductScreenContent(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreate,
+                modifier = Modifier.testTag(ProductScreenTag.ADD_PRODUCT_FAB),
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
             }
@@ -137,7 +139,8 @@ fun ProductScreenContent(
                     top = padding.calculateTopPadding(),
                     bottom = padding.calculateBottomPadding(),
                 )
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 12.dp)
+                .testTag(ProductScreenTag.SCROLLABLE_COLUMN),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {
@@ -167,6 +170,7 @@ fun ProductScreenContent(
                                 viewModel.onCategoryToggle(category)
                             },
                             label = { Text(category.getRu()) },
+                            modifier = Modifier.testTag("${ProductScreenTag.PREFIX}_${category.name}"),
                         )
                     }
                 }
@@ -183,6 +187,7 @@ fun ProductScreenContent(
                                 viewModel.onCookingToggle(category)
                             },
                             label = { Text(category.getRu()) },
+                            modifier = Modifier.testTag("${ProductScreenTag.PREFIX}_${category.name}"),
                         )
                     }
                 }
@@ -199,6 +204,7 @@ fun ProductScreenContent(
                                 viewModel.onFlagToggle(category)
                             },
                             label = { Text(category.getRu()) },
+                            modifier = Modifier.testTag("${ProductScreenTag.PREFIX}_${category.name}"),
                         )
                     }
                 }
@@ -217,6 +223,7 @@ fun ProductScreenContent(
                                 selected = field == state.sortBy,
                                 onClick = { viewModel.onSort(field, state.sortDirection) },
                                 label = { Text(field.getRu()) },
+                                modifier = Modifier.testTag("${ProductScreenTag.PREFIX}_${field.name}"),
                             )
                         }
                     }
