@@ -13,6 +13,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.Before
+import org.junit.After
 import org.junit.runner.RunWith
 import ru.k.kbook.MainActivity
 import ru.k.kbook.api.grpc.schema.DishCategory
@@ -26,6 +27,9 @@ import ru.k.kbook.navigation.NavigationTag
 import ru.k.kbook.features.utils.clearAllProducts
 import ru.k.kbook.features.utils.createProduct
 import ru.k.kbook.features.utils.createDish
+import ru.k.kbook.features.utils.clearAllDishes
+import ru.k.kbook.features.utils.navigateToDish
+import ru.k.kbook.features.utils.navigateToProduct
 
 @OptIn(ExperimentalTestApi::class)
 @HiltAndroidTest
@@ -77,13 +81,15 @@ class DishCreateScreenTest {
                 timeoutMillis = 10_000,
             )
 
-            onNodeWithTag(NavigationTag.DISHES).performClick()
+            navigateToDish()
 
             waitUntilNodeCount(
                 hasTestTag(DishScreenTag.CREATE_BUTTON),
                 count = 1,
                 timeoutMillis = 10_000,
             )
+
+            clearAllDishes()
 
             onNodeWithTag(DishScreenTag.CREATE_BUTTON).performClick()
 
@@ -95,8 +101,31 @@ class DishCreateScreenTest {
         }
     }
 
+    @After
+    fun after() {
+        with(composeTestRule) {
+            waitUntilNodeCount(
+                hasTestTag(DishScreenTag.CONTENT),
+                count = 1,
+                timeoutMillis = 5000,
+            )
+
+            clearAllDishes()
+
+            navigateToProduct()
+
+            waitUntilNodeCount(
+                hasTestTag(ProductScreenTag.ADD_PRODUCT_FAB),
+                count = 1,
+                timeoutMillis = 10_000,
+            )
+
+            clearAllProducts()
+        }
+    }
+
     @Test
-    fun createCorrectDish() {
+    fun createCorrectDishWithAutoCalculate() {
         with(composeTestRule) {
             val dishName = "Борщ тестовый"
 
@@ -131,4 +160,39 @@ class DishCreateScreenTest {
         }
     }
 
+    @Test
+    fun createCorrectDishWithCalculateByHand() {
+        with(composeTestRule) {
+            val dishName = "Борщ тестовый"
+
+            with(composeTestRule) {
+                waitUntilNodeCount(
+                    hasTestTag(DishCreateScreenTag.NAME_INPUT),
+                    count = 1,
+                    timeoutMillis = 15_000,
+                )
+
+                createDish(
+                    DishUiTest(
+                        name = dishName,
+                        category = DishCategory.FIRST,
+                        caloricity = 250.0,
+                        protein = 15.0,
+                        fat = 10.0,
+                        carb = 25.0,
+                        composition = listOf(listOf(testProductName, 250.0)),
+                        images = listOf("https://test.com/dish.jpg"),
+                        portionSize = 300.0
+                    ), true
+                )
+
+                waitUntilNodeCount(
+                    hasText(dishName),
+                    count = 1,
+                    timeoutMillis = 10_000,
+                )
+                onNodeWithText(dishName).assertExists()
+            }
+        }
+    }
 }
