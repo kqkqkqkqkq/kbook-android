@@ -2,6 +2,7 @@ package ru.k.kbook.features.product.utils
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -10,7 +11,11 @@ import androidx.compose.ui.test.performTextInput
 import ru.k.kbook.features.product.create.ProductCreateScreenTag
 import ru.k.kbook.features.product.list.ProductScreenTag
 import ru.k.kbook.features.product.models.ProductUiTest
+import androidx.compose.ui.test.onNodeWithTag
 
+/**
+ * Must be on the ProductCreateScreen
+ */
 fun SemanticsNodeInteractionsProvider.createProduct(product: ProductUiTest) {
 
     onNodeWithTag(ProductCreateScreenTag.NAME_INPUT).performTextInput(product.name)
@@ -29,6 +34,11 @@ fun SemanticsNodeInteractionsProvider.createProduct(product: ProductUiTest) {
     onNodeWithTag(ProductCreateScreenTag.SCROLLABLE_COLUMN)
         .performScrollToNode(hasTestTag(ProductCreateScreenTag.SAVE_BUTTON))
 
+    product.images.forEach { url ->
+        onNodeWithTag(ProductCreateScreenTag.URL_INPUT).performTextInput(url)
+        onNodeWithTag(ProductCreateScreenTag.ADD_IMAGE_BUTTON).performClick()
+    }
+
     onNodeWithTag(ProductCreateScreenTag.COOKING_REQUIRED_INPUT).performClick()
     onNodeWithTag("${ProductCreateScreenTag.PREFIX}_${product.cookingRequired.name}").performClick()
 
@@ -36,11 +46,17 @@ fun SemanticsNodeInteractionsProvider.createProduct(product: ProductUiTest) {
         onNodeWithTag("${ProductCreateScreenTag.PREFIX}_${flag.name}").performClick()
     }
 
+    onNodeWithTag(ProductCreateScreenTag.SCROLLABLE_COLUMN)
+        .performScrollToNode(hasTestTag(ProductCreateScreenTag.SAVE_BUTTON))
+
     onNodeWithTag(ProductCreateScreenTag.SAVE_BUTTON).performClick()
 
     Thread.sleep(2_000L)
 }
 
+/**
+ * Must be on the ProductScreen
+ */
 fun SemanticsNodeInteractionsProvider.clearAllProducts() {
 
     try {
@@ -51,10 +67,8 @@ fun SemanticsNodeInteractionsProvider.clearAllProducts() {
     }
 
     var hasProducts = true
-    var attempts = 0
-    val maxAttempts = 50
 
-    while (hasProducts && attempts < maxAttempts) {
+    while (hasProducts) {
         try {
             onAllNodesWithTag(ProductScreenTag.DELETE_PRODUCT_BUTTON)[0]
                 .performClick()
@@ -70,7 +84,6 @@ fun SemanticsNodeInteractionsProvider.clearAllProducts() {
         } catch (e: Exception) {
             hasProducts = false
         }
-        attempts++
     }
 
     Thread.sleep(500)

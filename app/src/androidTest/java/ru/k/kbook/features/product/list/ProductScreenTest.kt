@@ -1,12 +1,15 @@
 package ru.k.kbook.features.product.list
 
+import android.R.attr.name
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -16,6 +19,7 @@ import org.junit.Before
 import org.junit.After
 import org.junit.runner.RunWith
 import ru.k.kbook.MainActivity
+import ru.k.kbook.api.grpc.schema.ProductCategory
 import ru.k.kbook.features.product.create.ProductCreateScreenTag
 import ru.k.kbook.features.product.models.ProductUiTest
 import ru.k.kbook.features.product.utils.clearAllProducts
@@ -72,8 +76,9 @@ class ProductScreenTest {
 
 
     @Test
-    fun testFilters() {
+    fun getProductsWithFilterByCategory() {
         val productName = "Тестовый продукт"
+        val category = ProductCategory.MEAT
 
         with(composeTestRule) {
             waitUntilNodeCount(
@@ -90,7 +95,12 @@ class ProductScreenTest {
                 timeoutMillis = 5000,
             )
 
-            createProduct(ProductUiTest(name = productName))
+            createProduct(
+                ProductUiTest(
+                    name = productName,
+                    category = category,
+                )
+            )
 
             waitUntilNodeCount(
                 hasTestTag(ProductScreenTag.ADD_PRODUCT_FAB),
@@ -104,7 +114,24 @@ class ProductScreenTest {
                 timeoutMillis = 10_000,
             )
 
+            onNodeWithTag(ProductScreenTag.SCROLLABLE_COLUMN)
+                .performScrollToNode(hasTestTag(ProductScreenTag.FILTERS_ROW))
+
+            onNodeWithTag(ProductScreenTag.FILTERS_ROW)
+                .performScrollToNode(hasTestTag("${ProductScreenTag.PREFIX}_${category.name}"))
+
+            onNodeWithTag("${ProductScreenTag.PREFIX}_${category.name}").performClick()
+
             onNodeWithText(productName).assertExists()
+
+            onNodeWithTag("${ProductScreenTag.PREFIX}_${category.name}").performClick()
+
+            onNodeWithTag(ProductScreenTag.FILTERS_ROW)
+                .performScrollToNode(hasTestTag("${ProductScreenTag.PREFIX}_${ProductCategory.VEGETABLES.name}"))
+
+            onNodeWithTag("${ProductScreenTag.PREFIX}_${ProductCategory.VEGETABLES.name}").performClick()
+
+            onNodeWithText(productName).assertDoesNotExist()
         }
     }
 }

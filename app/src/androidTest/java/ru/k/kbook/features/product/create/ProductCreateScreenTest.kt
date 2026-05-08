@@ -1,53 +1,193 @@
-//package ru.k.kbook.features.product.create
-//
-//import androidx.compose.ui.test.ExperimentalTestApi
-//import androidx.compose.ui.test.hasTestTag
-//import androidx.compose.ui.test.junit4.createAndroidComposeRule
-//import androidx.compose.ui.test.onNodeWithTag
-//import androidx.compose.ui.test.performClick
-//import androidx.test.ext.junit.runners.AndroidJUnit4
-//import dagger.hilt.android.testing.HiltAndroidRule
-//import dagger.hilt.android.testing.HiltAndroidTest
-//import org.junit.Rule
-//import org.junit.Test
-//import org.junit.Before
-//import org.junit.BeforeEach
-//import org.junit.DisplayName
-//import org.junit.runner.RunWith
-//import ru.k.kbook.MainActivity
-//import ru.k.kbook.features.product.list.ProductScreenTag
-//
-//@OptIn(ExperimentalTestApi::class)
-//@HiltAndroidTest
-//@RunWith(AndroidJUnit4::class)
-//class ProductCreateScreenTest {
-//
-//    @get:Rule(order = 0)
-//    var hiltRule = HiltAndroidRule(this)
-//
-//    @get:Rule(order = 1)
-//    val composeTestRule = createAndroidComposeRule<MainActivity>()
-//
-//    @Before
-//    fun init() {
-//        hiltRule.inject()
-//    }
-//
-//    @BeforeEach
-//    fun beforeEach() {
-//
-//    }
-//
-//    @Test
-//    @DisplayName("filters")
-//    fun testFilters() {
-//        with(composeTestRule) {
-//            waitUntilNodeCount(
-//                hasTestTag(ProductScreenTag.ADD_PRODUCT_FAB),
-//                count = 1,
-//                timeoutMillis = 5000,
-//            )
-//            onNodeWithTag(ProductScreenTag.ADD_PRODUCT_FAB).performClick()
-//        }
-//    }
-//}
+package ru.k.kbook.features.product.create
+
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performTextInput
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Rule
+import org.junit.Test
+import org.junit.Before
+import org.junit.After
+import org.junit.runner.RunWith
+import ru.k.kbook.MainActivity
+import ru.k.kbook.api.grpc.schema.Product
+import ru.k.kbook.features.product.list.ProductScreenTag
+import ru.k.kbook.features.product.models.ProductUiTest
+import ru.k.kbook.features.product.utils.clearAllProducts
+import ru.k.kbook.features.product.utils.createProduct
+
+@OptIn(ExperimentalTestApi::class)
+@HiltAndroidTest
+@RunWith(AndroidJUnit4::class)
+class ProductCreateScreenTest {
+
+    @get:Rule(order = 0)
+    var hiltRule = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Before
+    fun before() {
+        hiltRule.inject()
+        with(composeTestRule) {
+            clearAllProducts()
+
+            waitUntilNodeCount(
+                hasTestTag(ProductScreenTag.ADD_PRODUCT_FAB),
+                count = 1,
+                timeoutMillis = 5000,
+            )
+
+            onNodeWithTag(ProductScreenTag.ADD_PRODUCT_FAB).performClick()
+        }
+    }
+
+    @After
+    fun after() {
+        with(composeTestRule) {
+            waitUntilNodeCount(
+                hasTestTag(ProductScreenTag.CONTENT),
+                count = 1,
+                timeoutMillis = 5000,
+            )
+            clearAllProducts()
+        }
+    }
+
+    @Test
+    fun createProductWithCorrectData() {
+        val productName = "Тестовый продукт"
+
+        with(composeTestRule) {
+            waitUntilNodeCount(
+                hasTestTag(ProductCreateScreenTag.NAME_INPUT),
+                count = 1,
+                timeoutMillis = 5000,
+            )
+
+            createProduct(ProductUiTest(name = productName))
+
+            waitUntilNodeCount(
+                hasText(productName),
+                count = 1,
+                timeoutMillis = 10_000,
+            )
+
+            onNodeWithText(productName).assertExists()
+        }
+    }
+
+    @Test
+    fun createProductWithOneSymbolName() {
+        val productName = "A"
+
+        with(composeTestRule) {
+            waitUntilNodeCount(
+                hasTestTag(ProductCreateScreenTag.NAME_INPUT),
+                count = 1,
+                timeoutMillis = 5000,
+            )
+
+            createProduct(ProductUiTest(name = productName))
+
+            waitUntilNodeCount(
+                hasTestTag(ProductCreateScreenTag.SNACKBAR),
+                count = 1,
+                timeoutMillis = 10_000,
+            )
+
+            onNodeWithTag(ProductCreateScreenTag.SNACKBAR).assertExists()
+
+            onNodeWithTag(ProductCreateScreenTag.BACK_BUTTON).performClick()
+        }
+    }
+
+    @Test
+    fun createProductWithNegativeCaloricity() {
+        val productName = "Test product"
+
+        with(composeTestRule) {
+            waitUntilNodeCount(
+                hasTestTag(ProductCreateScreenTag.NAME_INPUT),
+                count = 1,
+                timeoutMillis = 5000,
+            )
+
+            createProduct(
+                ProductUiTest(
+                    name = productName,
+                    caloricity = -100.0,
+                )
+            )
+
+            waitUntilNodeCount(
+                hasTestTag(ProductCreateScreenTag.SNACKBAR),
+                count = 1,
+                timeoutMillis = 10_000,
+            )
+
+            onNodeWithTag(ProductCreateScreenTag.SNACKBAR).assertExists()
+
+            onNodeWithTag(ProductCreateScreenTag.BACK_BUTTON).performClick()
+        }
+    }
+
+    @Test
+    fun createProductWithMoreThanFivePhotos() {
+        val productName = "Test product"
+        val url = "https://test.com"
+
+        with(composeTestRule) {
+            waitUntilNodeCount(
+                hasTestTag(ProductCreateScreenTag.NAME_INPUT),
+                count = 1,
+                timeoutMillis = 5000,
+            )
+
+            createProduct(ProductUiTest(name = productName, images = listOf(url, url, url, url, url, url)))
+
+            waitUntilNodeCount(
+                hasTestTag(ProductCreateScreenTag.SNACKBAR),
+                count = 1,
+                timeoutMillis = 10_000,
+            )
+
+            onNodeWithTag(ProductCreateScreenTag.SNACKBAR).assertExists()
+
+            onNodeWithTag(ProductCreateScreenTag.BACK_BUTTON).performClick()
+        }
+    }
+
+    @Test
+    fun createProductWithFivePhotos() {
+        val productName = "Test product"
+        val url = "https://test.com"
+
+        with(composeTestRule) {
+            waitUntilNodeCount(
+                hasTestTag(ProductCreateScreenTag.NAME_INPUT),
+                count = 1,
+                timeoutMillis = 5000,
+            )
+
+            createProduct(ProductUiTest(name = productName, images = listOf(url, url, url, url, url)))
+
+            waitUntilNodeCount(
+                hasText(productName),
+                count = 1,
+                timeoutMillis = 10_000,
+            )
+
+            onNodeWithText(productName).assertExists()
+        }
+    }
+}

@@ -160,7 +160,9 @@ fun ProductScreenContent(
             }
             item {
                 LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(ProductScreenTag.FILTERS_ROW),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(ProductCategory.entries) { category ->

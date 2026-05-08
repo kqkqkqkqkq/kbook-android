@@ -3,6 +3,7 @@ package ru.k.kbook.features.product.list
 object ProductScreenTag {
     const val PREFIX = "ProductScreenTag"
     const val SCROLLABLE_COLUMN = "${PREFIX}_scrollable_column"
+    const val FILTERS_ROW = "${PREFIX}_filters_row"
     const val LOADING = "ProductScreenTag_loading"
     const val ERROR = "ProductScreenTag_error"
     const val CONTENT = "ProductScreenTag_content"

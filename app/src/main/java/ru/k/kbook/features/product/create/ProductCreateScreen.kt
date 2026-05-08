@@ -341,7 +341,7 @@ fun ProductCreateScreen(
             if (state.error != null) {
                 snackbarHostState.showSnackbar(
                     message = state.error!!,
-                    duration = SnackbarDuration.Long,
+                    duration = SnackbarDuration.Short,
                     withDismissAction = true,
                 )
                 vm.clearError()
