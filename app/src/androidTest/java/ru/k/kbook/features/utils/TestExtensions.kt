@@ -1,4 +1,4 @@
-package ru.k.kbook.features.product.utils
+package ru.k.kbook.features.utils
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.hasTestTag
@@ -12,6 +12,8 @@ import ru.k.kbook.features.product.create.ProductCreateScreenTag
 import ru.k.kbook.features.product.list.ProductScreenTag
 import ru.k.kbook.features.product.models.ProductUiTest
 import androidx.compose.ui.test.onNodeWithTag
+import ru.k.kbook.features.dish.create.DishCreateScreenTag
+import ru.k.kbook.features.dish.models.DishUiTest
 
 /**
  * Must be on the ProductCreateScreen
@@ -87,4 +89,58 @@ fun SemanticsNodeInteractionsProvider.clearAllProducts() {
     }
 
     Thread.sleep(500)
+}
+
+
+/**
+ * Must be on the DishCreateScreen
+ */
+fun SemanticsNodeInteractionsProvider.createDish(dish: DishUiTest, auto: Boolean = false) {
+
+    onNodeWithTag(DishCreateScreenTag.NAME_INPUT).performTextInput(dish.name)
+
+    if (auto) {
+        onNodeWithTag(DishCreateScreenTag.CALORICITY_INPUT).performTextInput(dish.caloricity.toString())
+        onNodeWithTag(DishCreateScreenTag.PROTEIN_INPUT).performTextInput(dish.protein.toString())
+        onNodeWithTag(DishCreateScreenTag.FAT_INPUT).performTextInput(dish.fat.toString())
+        onNodeWithTag(DishCreateScreenTag.CARB_INPUT).performTextInput(dish.carb.toString())
+    }
+
+    onNodeWithTag(DishCreateScreenTag.SIZE_INPUT).performTextInput(dish.portionSize.toString())
+    onNodeWithTag(DishCreateScreenTag.CATEGORY_INPUT, useUnmergedTree = true).performClick()
+    onNodeWithTag("${DishCreateScreenTag.PREFIX}_${dish.category.name}").performClick()
+
+    onNodeWithTag(DishCreateScreenTag.SCROLLABLE_COLUMN)
+        .performScrollToNode(hasTestTag(DishCreateScreenTag.ADD_COMPOSITION_BUTTON))
+
+    dish.composition.forEach { p ->
+        onNodeWithTag(DishCreateScreenTag.ADD_COMPOSITION_BUTTON).performClick()
+        onNodeWithTag("${DishCreateScreenTag.PREFIX}_${p[0]}").performClick()
+        onNodeWithTag(DishCreateScreenTag.SIZE_INPUT).performTextInput(p[1].toString())
+        onNodeWithTag(DishCreateScreenTag.ADD_COMPOSITION_SUBMIT_BUTTON).performClick()
+    }
+
+    onNodeWithTag(DishCreateScreenTag.SCROLLABLE_COLUMN)
+        .performScrollToNode(hasTestTag(DishCreateScreenTag.ADD_IMAGE_BUTTON))
+
+    dish.images.forEach { url ->
+        onNodeWithTag(DishCreateScreenTag.URL_INPUT).performTextInput(url)
+        onNodeWithTag(DishCreateScreenTag.ADD_IMAGE_BUTTON).performClick()
+    }
+
+    onNodeWithTag(DishCreateScreenTag.SCROLLABLE_COLUMN)
+        .performScrollToNode(hasTestTag(DishCreateScreenTag.ADD_COMPOSITION_BUTTON))
+
+    onNodeWithTag(DishCreateScreenTag.ADD_COMPOSITION_BUTTON).performClick()
+
+    onNodeWithTag(DishCreateScreenTag.SCROLLABLE_COLUMN)
+        .performScrollToNode(hasTestTag(DishCreateScreenTag.SAVE_BUTTON))
+
+    dish.flags.forEach { flag ->
+        onNodeWithTag("${DishCreateScreenTag.PREFIX}_${flag.name}").performClick()
+    }
+
+    onNodeWithTag(DishCreateScreenTag.SAVE_BUTTON).performClick()
+
+    Thread.sleep(2_000L)
 }

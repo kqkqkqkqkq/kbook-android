@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -25,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -78,11 +80,13 @@ private fun DishListContent(
     Scaffold(
         modifier = Modifier
             .padding(bottom = 80.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .testTag(DishScreenTag.CONTENT),
         topBar = { TopAppBar(title = { Text("Блюда") }) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreate,
+                modifier = Modifier.testTag(DishScreenTag.CREATE_BUTTON),
             ) {
                 Icon(Icons.Default.Add, contentDescription = null)
             }
@@ -96,7 +100,8 @@ private fun DishListContent(
                     top = padding.calculateTopPadding(),
                     bottom = padding.calculateBottomPadding(),
                 )
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 12.dp)
+                .testTag(DishScreenTag.SCROLLABLE_COLUMN),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start,
         ) {

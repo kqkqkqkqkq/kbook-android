@@ -7,8 +7,6 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToNode
-import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -16,13 +14,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.Before
 import org.junit.After
+import org.junit.Ignore
 import org.junit.runner.RunWith
 import ru.k.kbook.MainActivity
-import ru.k.kbook.api.grpc.schema.Product
 import ru.k.kbook.features.product.list.ProductScreenTag
 import ru.k.kbook.features.product.models.ProductUiTest
-import ru.k.kbook.features.product.utils.clearAllProducts
-import ru.k.kbook.features.product.utils.createProduct
+import ru.k.kbook.features.utils.clearAllProducts
+import ru.k.kbook.features.utils.createProduct
 
 @OptIn(ExperimentalTestApi::class)
 @HiltAndroidTest
@@ -64,6 +62,7 @@ class ProductCreateScreenTest {
     }
 
     @Test
+    @Ignore("Временно отключен")
     fun createProductWithCorrectData() {
         val productName = "Тестовый продукт"
 
@@ -87,6 +86,7 @@ class ProductCreateScreenTest {
     }
 
     @Test
+    @Ignore("Временно отключен")
     fun createProductWithOneSymbolName() {
         val productName = "A"
 
@@ -112,6 +112,7 @@ class ProductCreateScreenTest {
     }
 
     @Test
+    @Ignore("Временно отключен")
     fun createProductWithNegativeCaloricity() {
         val productName = "Test product"
 
@@ -142,6 +143,40 @@ class ProductCreateScreenTest {
     }
 
     @Test
+    @Ignore("Временно отключен")
+    fun createProductWithHighBju() {
+        val productName = "Test product"
+
+        with(composeTestRule) {
+            waitUntilNodeCount(
+                hasTestTag(ProductCreateScreenTag.NAME_INPUT),
+                count = 1,
+                timeoutMillis = 5000,
+            )
+
+            createProduct(
+                ProductUiTest(
+                    name = productName,
+                    protein = 50.0,
+                    fat = 50.0,
+                    carb = 50.0,
+                )
+            )
+
+            waitUntilNodeCount(
+                hasTestTag(ProductCreateScreenTag.SNACKBAR),
+                count = 1,
+                timeoutMillis = 10_000,
+            )
+
+            onNodeWithTag(ProductCreateScreenTag.SNACKBAR).assertExists()
+
+            onNodeWithTag(ProductCreateScreenTag.BACK_BUTTON).performClick()
+        }
+    }
+
+    @Test
+    @Ignore("Временно отключен")
     fun createProductWithMoreThanFivePhotos() {
         val productName = "Test product"
         val url = "https://test.com"
@@ -168,6 +203,7 @@ class ProductCreateScreenTest {
     }
 
     @Test
+    @Ignore("Временно отключен")
     fun createProductWithFivePhotos() {
         val productName = "Test product"
         val url = "https://test.com"

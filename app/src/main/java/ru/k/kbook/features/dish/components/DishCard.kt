@@ -19,12 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import ru.k.kbook.R
 import ru.k.kbook.api.grpc.schema.Dish
+import ru.k.kbook.features.dish.DishScreenTag
 
 @Composable
 fun DishCard(
@@ -34,7 +36,9 @@ fun DishCard(
 ) {
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag(DishScreenTag.CARD),
         onClick = {
             onClick(dish)
         },
@@ -71,6 +75,7 @@ fun DishCard(
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.testTag(DishScreenTag.CARD_TITLE),
                 )
                 Text(
                     "${dish.caloricity} ккал/порция",
@@ -80,7 +85,11 @@ fun DishCard(
                 Text(dish.category.getRu(), style = MaterialTheme.typography.labelMedium)
                 Text("Порция: ${dish.portionSize} г", style = MaterialTheme.typography.labelMedium)
             }
-            IconButton(onClick = { onDelete(dish) }, shape = MaterialTheme.shapes.small) {
+            IconButton(
+                onClick = { onDelete(dish) },
+                shape = MaterialTheme.shapes.small,
+                modifier = Modifier.testTag(DishScreenTag.CARD_DELETE_BUTTON),
+            ) {
                 Icon(
                     Icons.Filled.Delete,
                     contentDescription = null,

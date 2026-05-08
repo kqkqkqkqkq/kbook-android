@@ -46,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -83,7 +84,10 @@ fun DishCreateScreen(
             TopAppBar(
                 title = { Text("Новое блюдо") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.testTag(DishCreateScreenTag.BACK_BUTTON),
+                    ) {
                         Icon(
                             Icons.Default.ArrowBack,
                             null,
@@ -92,7 +96,12 @@ fun DishCreateScreen(
                 },
             )
         },
-        snackbarHost = { SnackbarHost(snackbar) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbar,
+                modifier = Modifier.testTag(DishCreateScreenTag.SNACKBAR),
+            )
+        },
     ) { padding ->
         if (state.isLoading) {
             Box(
@@ -108,25 +117,27 @@ fun DishCreateScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
-                .padding(16.dp),
+                .padding(16.dp)
+                .testTag(DishCreateScreenTag.SCROLLABLE_COLUMN),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             OutlinedTextField(
                 state.name,
                 vm::updateName,
                 label = { Text("Название") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag(DishCreateScreenTag.NAME_INPUT),
             )
             OutlinedTextField(
                 state.portionSize,
                 vm::updatePortionSize,
                 label = { Text("Размер порции, г") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag(DishCreateScreenTag.SIZE_INPUT),
             )
             ExposedDropdownMenuBox(
                 expanded = categoryExpanded,
                 onExpandedChange = { categoryExpanded = !categoryExpanded },
+                modifier = Modifier.testTag(DishCreateScreenTag.CATEGORY_INPUT),
             ) {
                 OutlinedTextField(
                     readOnly = true,
@@ -150,6 +161,7 @@ fun DishCreateScreen(
                         DropdownMenuItem(
                             text = { Text(item.getRu()) },
                             onClick = { vm.updateCategory(item); categoryExpanded = false },
+                            modifier = Modifier.testTag("${DishCreateScreenTag.PREFIX}_${item.name}"),
                         )
                     }
                 }
@@ -159,7 +171,7 @@ fun DishCreateScreen(
                 vm::updateCaloricity,
                 label = { Text("Калории на порцию (авто: ${state.autoCaloricity.round1()})") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag(DishCreateScreenTag.CALORICITY_INPUT),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
@@ -167,28 +179,30 @@ fun DishCreateScreen(
                     vm::updateProtein,
                     label = { Text("Б (авто: ${state.autoProtein.round1()})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag(DishCreateScreenTag.PROTEIN_INPUT),
                 )
                 OutlinedTextField(
                     state.fat,
                     vm::updateFat,
                     label = { Text("Ж (авто: ${state.autoFat.round1()})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag(DishCreateScreenTag.FAT_INPUT),
                 )
                 OutlinedTextField(
                     state.carb,
                     vm::updateCarb,
                     label = { Text("У (авто: ${state.autoCarb.round1()})") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag(DishCreateScreenTag.CARB_INPUT),
                 )
             }
             Row {
                 ExposedDropdownMenuBox(
                     expanded = productExpanded,
                     onExpandedChange = { productExpanded = !productExpanded },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .testTag(DishCreateScreenTag.ADD_COMPOSITION_BUTTON),
                 ) {
                     OutlinedTextField(
                         readOnly = true,
@@ -204,12 +218,14 @@ fun DishCreateScreen(
                         expanded = productExpanded,
                         onDismissRequest = { productExpanded = false },
                     ) {
+                        // Product
                         state.products.forEach { p ->
                             DropdownMenuItem(
                                 text = { Text(p.name) },
                                 onClick = {
                                     vm.updateSelectedProduct(p.id); productExpanded = false
                                 },
+                                modifier = Modifier.testTag("${DishCreateScreenTag.PREFIX}_${p.name}"),
                             )
                         }
                     }
@@ -221,17 +237,25 @@ fun DishCreateScreen(
                     vm::updateSelectedQuantity,
                     label = { Text("Граммы") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).testTag(DishCreateScreenTag.WEIGHT_INPUT),
                 )
             }
-            Button(onClick = vm::addCompositionItem) { Text("Добавить") }
+            Button(
+                onClick = vm::addCompositionItem,
+                modifier = Modifier.testTag(DishCreateScreenTag.ADD_COMPOSITION_SUBMIT_BUTTON),
+            ) {
+                Text("Добавить")
+            }
             state.composition.forEachIndexed { i, item ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text("${item.productName}: ${item.quantity} г")
-                    IconButton(onClick = { vm.removeCompositionItem(i) }) {
+                    IconButton(
+                        onClick = { vm.removeCompositionItem(i) },
+                        modifier = Modifier.testTag(DishCreateScreenTag.REMOVE_PRODUCT_BUTTON),
+                    ) {
                         Icon(
                             Icons.Default.Delete,
                             null,
@@ -245,13 +269,16 @@ fun DishCreateScreen(
                     onClick = { vm.toggleFlag(flag) },
                     enabled = flag in state.availableFlags,
                     label = { Text(flag.getRu()) },
+                    modifier = Modifier.testTag("${DishCreateScreenTag.PREFIX}_${flag.name}")
                 )
             }
             OutlinedTextField(
                 value = imageUrl,
                 onValueChange = { imageUrl = it },
                 label = { Text("URL фото") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(DishCreateScreenTag.URL_INPUT),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
@@ -260,6 +287,7 @@ fun DishCreateScreen(
                             vm.addImage(DishImage(0L, imageUrl, null, "URL")); imageUrl = ""
                         }
                     },
+                    modifier = Modifier.testTag(DishCreateScreenTag.ADD_IMAGE_BUTTON),
                 ) { Text("Добавить URL") }
                 Button(onClick = { galleryLauncher.launch("image/*") }) { Text("Галерея") }
             }
@@ -285,7 +313,9 @@ fun DishCreateScreen(
                                 )
                             }
                             IconButton(
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .testTag(DishCreateScreenTag.REMOVE_IMAGE_BUTTON),
                                 onClick = { vm.removeImage(image) },
                             ) {
                                 Icon(
@@ -301,7 +331,7 @@ fun DishCreateScreen(
             Button(
                 onClick = { vm.save(onNavigateBack) },
                 enabled = !state.isSaving,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag(DishCreateScreenTag.SAVE_BUTTON),
             ) { Text("Создать блюдо") }
         }
     }
