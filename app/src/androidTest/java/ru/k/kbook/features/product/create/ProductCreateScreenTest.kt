@@ -62,7 +62,6 @@ class ProductCreateScreenTest {
     }
 
     @Test
-    @Ignore("Временно отключен")
     fun createProductWithCorrectData() {
         val productName = "Тестовый продукт"
 
@@ -86,7 +85,6 @@ class ProductCreateScreenTest {
     }
 
     @Test
-    @Ignore("Временно отключен")
     fun createProductWithOneSymbolName() {
         val productName = "A"
 
@@ -112,7 +110,6 @@ class ProductCreateScreenTest {
     }
 
     @Test
-    @Ignore("Временно отключен")
     fun createProductWithNegativeCaloricity() {
         val productName = "Test product"
 
@@ -143,7 +140,6 @@ class ProductCreateScreenTest {
     }
 
     @Test
-    @Ignore("Временно отключен")
     fun createProductWithHighBju() {
         val productName = "Test product"
 
@@ -176,7 +172,6 @@ class ProductCreateScreenTest {
     }
 
     @Test
-    @Ignore("Временно отключен")
     fun createProductWithMoreThanFivePhotos() {
         val productName = "Test product"
         val url = "https://test.com"
@@ -203,7 +198,6 @@ class ProductCreateScreenTest {
     }
 
     @Test
-    @Ignore("Временно отключен")
     fun createProductWithFivePhotos() {
         val productName = "Test product"
         val url = "https://test.com"

@@ -73,11 +73,14 @@ fun SemanticsNodeInteractionsProvider.clearAllProducts() {
     }
 
     var hasProducts = true
+    var attempts = 0
 
-    while (hasProducts) {
+    while (hasProducts && attempts < 3) {
         try {
             onAllNodesWithTag(ProductScreenTag.DELETE_PRODUCT_BUTTON)[0]
                 .performClick()
+
+            attempts++
 
             Thread.sleep(500)
 
@@ -99,7 +102,7 @@ fun SemanticsNodeInteractionsProvider.clearAllProducts() {
 /**
  * Must be on the DishCreateScreen
  */
-fun SemanticsNodeInteractionsProvider.createDish(dish: DishUiTest, auto: Boolean = false) {
+fun SemanticsNodeInteractionsProvider.createDish(dish: DishUiTest, auto: Boolean = true) {
 
     onNodeWithTag(DishCreateScreenTag.NAME_INPUT).performTextInput(dish.name)
 
@@ -152,6 +155,9 @@ fun SemanticsNodeInteractionsProvider.createDish(dish: DishUiTest, auto: Boolean
     Thread.sleep(2_000L)
 }
 
+/**
+ * Must be on the DishCreateScreen
+ */
 fun SemanticsNodeInteractionsProvider.clearAllDishes() {
     while (true) {
         try {

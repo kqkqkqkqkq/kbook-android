@@ -155,7 +155,44 @@ class DishCreateScreenTest {
                     count = 1,
                     timeoutMillis = 10_000,
                 )
+
                 onNodeWithText(dishName).assertExists()
+            }
+        }
+    }
+
+    @Test
+    fun checkMacrosRemovingFromTheTitle() {
+        with(composeTestRule) {
+            val dishName = "Борщ тестовый !первое"
+
+            with(composeTestRule) {
+                waitUntilNodeCount(
+                    hasTestTag(DishCreateScreenTag.NAME_INPUT),
+                    count = 1,
+                    timeoutMillis = 15_000,
+                )
+
+                createDish(
+                    DishUiTest(
+                        name = dishName,
+                        caloricity = 250.0,
+                        protein = 15.0,
+                        fat = 10.0,
+                        carb = 25.0,
+                        composition = listOf(listOf(testProductName, 250.0)),
+                        images = listOf("https://test.com/dish.jpg"),
+                        portionSize = 300.0
+                    )
+                )
+
+                waitUntilNodeCount(
+                    hasText("Борщ тестовый"),
+                    count = 1,
+                    timeoutMillis = 10_000,
+                )
+
+                onNodeWithText("Борщ тестовый").assertExists()
             }
         }
     }
@@ -183,7 +220,7 @@ class DishCreateScreenTest {
                         composition = listOf(listOf(testProductName, 250.0)),
                         images = listOf("https://test.com/dish.jpg"),
                         portionSize = 300.0
-                    ), true
+                    ), false
                 )
 
                 waitUntilNodeCount(
@@ -191,7 +228,41 @@ class DishCreateScreenTest {
                     count = 1,
                     timeoutMillis = 10_000,
                 )
+
                 onNodeWithText(dishName).assertExists()
+            }
+        }
+    }
+
+    @Test
+    fun createDishWithMoreThanFiveImages() {
+        with(composeTestRule) {
+            val dishName = "Борщ тестовый"
+            val url = "https://test.com/dish.jpg"
+
+            with(composeTestRule) {
+                waitUntilNodeCount(
+                    hasTestTag(DishCreateScreenTag.NAME_INPUT),
+                    count = 1,
+                    timeoutMillis = 15_000,
+                )
+
+                createDish(
+                    DishUiTest(
+                        name = dishName,
+                        category = DishCategory.FIRST,
+                        caloricity = 250.0,
+                        protein = 15.0,
+                        fat = 10.0,
+                        carb = 25.0,
+                        composition = listOf(listOf(testProductName, 250.0)),
+                        images = listOf(url, url, url, url, url, url),
+                        portionSize = 300.0
+                    ), true
+                )
+
+                onNodeWithTag(DishCreateScreenTag.SNACKBAR).assertExists()
+                onNodeWithTag(DishCreateScreenTag.BACK_BUTTON).performClick()
             }
         }
     }

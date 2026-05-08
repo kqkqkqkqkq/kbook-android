@@ -72,7 +72,6 @@ class ProductDetailsScreenTest {
     }
 
     @Test
-    @Ignore("Временно отключен")
     fun displayedUpdatedDateAfterUpdate() {
         with(composeTestRule) {
             onAllNodesWithTag(ProductScreenTag.PRODUCT_CARD)[0].performClick()
